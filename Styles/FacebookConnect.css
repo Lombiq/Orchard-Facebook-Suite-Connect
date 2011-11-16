@@ -1,0 +1,28 @@
+﻿#facebook-connect-link, #sign-out-to-connect-with-facebook-link, #facebook-logout-link
+{
+    background: url("http://static.ak.fbcdn.net/rsrc.php/v1/yL/r/FGFbc80dUKj.png") no-repeat left -188px;
+    display: inline-block;
+    outline: none;
+    padding: 0 0 0 27px;
+    height: 22px;
+    line-height: 22px;
+}
+
+/* User profile
+***************************************************************/
+#current-facebook-user-profile 
+{
+    margin: 0 0 10px 0;
+}
+
+    #current-facebook-user-picture 
+    {
+        display: block;
+        margin: 0 auto 10px auto;
+    }
+
+    #current-facebook-user-name
+    {
+        display: block;
+        text-align: center;
+    }

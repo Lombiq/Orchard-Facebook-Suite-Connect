@@ -1,0 +1,29 @@
+﻿@using System.Web.Mvc;
+@{
+    string returnUrl = Context.Request.QueryString["ReturnUrl"] ?? Context.Request.RawUrl;
+
+    if (!Model.IsAuthenticated)
+    {
+        returnUrl = Url.RouteUrl("FacebookConnect", new { Permissions = Model.Permissions, OnlyAllowVerified = Model.OnlyAllowVerified, ReturnUrl = returnUrl });
+    }
+    else
+    {
+        returnUrl = Url.Action("LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = returnUrl });
+    }
+}
+@{
+    Script.Require("FacebookConnect").AtHead();
+    Style.Require("FacebookConnect");
+}
+@if (!Model.IsAuthenticated)
+{
+    @Display(New.FacebookConnectNotAuthenticated(Permissions: Model.Permissions, ReturnUrl: returnUrl))
+}
+else if (Model.IsConnected)
+{
+    @Display(New.FacebookConnectAuthenticated(CurrentUser: Model.CurrentUser, ReturnUrl: returnUrl))
+}
+else
+{
+    @Html.ActionLink(T("Sign out to log in with Facebook").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { id = "sign-out-to-connect-with-facebook-link" } )
+}
