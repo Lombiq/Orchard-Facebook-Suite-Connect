@@ -8,6 +8,8 @@ using Orchard.UI.Notify;
 using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
+using System;
+using Piedone.Avatars.Models;
 
 namespace Piedone.Facebook.Suite.Drivers
 {
@@ -71,7 +73,8 @@ namespace Piedone.Facebook.Suite.Drivers
                     if (isConnected)
                     {
                         CurrentUser.Name = currentFacebookUserPart.Name;
-                        CurrentUser.PictureLink = currentFacebookUserPart.PictureLink;
+                        var avatar = currentFacebookUserPart.As<AvatarProfilePart>();
+                        CurrentUser.PictureLink = !String.IsNullOrEmpty(avatar.ImageUrl) ? avatar.ImageUrl : currentFacebookUserPart.PictureLink;
                         CurrentUser.Link = currentFacebookUserPart.Link;
                     }
 

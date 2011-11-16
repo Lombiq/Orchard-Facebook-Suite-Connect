@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Facebook.Web;
 using Orchard;
 using Orchard.ContentManagement; // For generic ContentManager methods
@@ -7,21 +10,23 @@ using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Security;
+using Piedone.Avatars.Services;
 using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
 using Piedone.ServiceValidation.Dictionaries;
-using System.Threading.Tasks;
+using Piedone.ServiceValidation.ServiceInterfaces;
+using Piedone.Avatars.Models;
 
 namespace Piedone.Facebook.Suite.Services
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookConnectService : IFacebookConnectService
+    public class FacebookConnectService : IFacebookConnectService, IValidatingService
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IMembershipService _membershipService;
-        private readonly IOrchardServices _orchardServices;
         private readonly IContentManager _contentManager;
         private readonly IFacebookSuiteService _facebookSuiteService;
+        private readonly IAvatarsService _avatarsService;
 
         public IServiceValidationDictionary ValidationDictionary { get; private set; }
         public ILogger Logger { get; set; }
@@ -30,16 +35,17 @@ namespace Piedone.Facebook.Suite.Services
         public FacebookConnectService(
             IAuthenticationService authenticationService,
             IMembershipService membershipService,
-            IOrchardServices orchardServices,
+            IContentManager contentManager,
             IServiceValidationDictionary validationDictionary,
-            IFacebookSuiteService facebookSuiteService)
+            IFacebookSuiteService facebookSuiteService,
+            IAvatarsService avatarsService)
         {
             _authenticationService = authenticationService;
             _membershipService = membershipService;
-            _orchardServices = orchardServices;
-            _contentManager = orchardServices.ContentManager;
+            _contentManager = contentManager;
             ValidationDictionary = validationDictionary;
             _facebookSuiteService = facebookSuiteService;
+            _avatarsService = avatarsService;
 
             Logger = NullLogger.Instance; // Constructor injection of ILogger fails
             T = NullLocalizer.Instance;
@@ -78,9 +84,9 @@ namespace Piedone.Facebook.Suite.Services
 
             // Now we know that the user is authenticated on Facebook and connected to our app.
 
-            FacebookUserPart fbUserPart = GetFacebookUserPart(_facebookSuiteService.FacebookWebContext.UserId); // Check if we already have the user's data saved
+            FacebookUserPart facebookUserPart = GetFacebookUserPart(_facebookSuiteService.FacebookWebContext.UserId); // Check if we already have the user's data saved
 
-            var fbClient = new FacebookWebClient(_facebookSuiteService.FacebookWebContext);
+            var facebookClient = new FacebookWebClient(_facebookSuiteService.FacebookWebContext);
 
             Action<IUser> forceSignIn =
                 u =>
@@ -94,10 +100,13 @@ namespace Piedone.Facebook.Suite.Services
             dynamic me = "";
 
             // We have previously saved the user's data
-            if (fbUserPart != null)
+            if (facebookUserPart != null)
             {
-                forceSignIn(fbUserPart.As<Orchard.Users.Models.UserPart>().As<IUser>());
-                fbClient.GetCompleted +=
+                forceSignIn(facebookUserPart.As<Orchard.Users.Models.UserPart>().As<IUser>());
+
+                UpdateAvatarAsync(facebookUserPart);
+
+                facebookClient.GetCompleted +=
                     (sender, e) =>
                     {
                         if (e.Error == null)
@@ -108,9 +117,9 @@ namespace Piedone.Facebook.Suite.Services
                             //bool nameHasChanged = fbUserPart.Name != me.name;
 
                             // Update saved user
-                            fbUserPart = FacebookUserDataMapper.MapToFacebookUserPart(
+                            facebookUserPart = FacebookUserDataMapper.MapToFacebookUserPart(
                                 new FacebookUserDataMapper(me),
-                                fbUserPart);
+                                facebookUserPart);
                             _contentManager.Flush(); // Else the update would not commit.
 
                             //if (nameHasChanged)
@@ -127,14 +136,14 @@ namespace Piedone.Facebook.Suite.Services
                             // Maybe not wise to throw an exception here
                         }
                     };
-                fbClient.GetAsync("me"); // Updating user data can run in the background
+                facebookClient.GetAsync("me"); // Updating user data can run in the background
             }
             // We don't currently have the user's data
             else
             {
                 try
                 {
-                    me = fbClient.Get("me");
+                    me = facebookClient.Get("me"); // First login should run synchronously to get user data
                     var dataMapper = new FacebookUserDataMapper(me);
 
                     if (onlyAllowVerified && !dataMapper.IsVerified)
@@ -142,12 +151,6 @@ namespace Piedone.Facebook.Suite.Services
                         ValidationDictionary.AddError("notVerified", T("User is not verified."));
                         return false;
                     }
-
-                    var avatarTask = new Task(() =>
-                    {
-                        // download avatar
-                    });
-                    avatarTask.Start();
 
                     // Does not need to verifiy user unicity as there can be more people with the same name.
                     // Or maybe it would be clever to get the email too, so users will be guaranteedly unique.
@@ -161,8 +164,8 @@ namespace Piedone.Facebook.Suite.Services
                             "",
                             true));
 
-                    fbUserPart = authenticatedUser.As<FacebookUserPart>();
-                    fbUserPart = FacebookUserDataMapper.MapToFacebookUserPart(dataMapper, fbUserPart);
+                    facebookUserPart = authenticatedUser.As<FacebookUserPart>();
+                    facebookUserPart = FacebookUserDataMapper.MapToFacebookUserPart(dataMapper, facebookUserPart);
 
                     forceSignIn(authenticatedUser);
                 }
@@ -206,6 +209,20 @@ namespace Piedone.Facebook.Suite.Services
             var authenticatedUser = _authenticationService.GetAuthenticatedUser();
             if (authenticatedUser == null) return null;
             return GetFacebookUserPart(authenticatedUser.Id);
+        }
+
+        private void UpdateAvatarAsync(FacebookUserPart facebookUserPart)
+        {
+            if (String.IsNullOrEmpty(facebookUserPart.PictureLink)) return;
+
+            var avatarTask = new Task(() =>
+            {
+                var wc = new WebClient();
+                var pictureData = wc.DownloadData(facebookUserPart.PictureLink);
+                var stream = new MemoryStream(pictureData);
+                _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not.
+            });
+            avatarTask.Start();
         }
     }
 }
