@@ -81,8 +81,8 @@ namespace Piedone.Facebook.Suite.Drivers
                     return shapeHelper.Parts_FacebookConnect(
                                 IsAuthenticated: isAuthenticated,
                                 IsConnected: isConnected,
+                                ConnectId: part.Id,
                                 Permissions: part.Permissions,
-                                OnlyAllowVerified: part.OnlyAllowVerified,
                                 CurrentUser: CurrentUser);
                 });
         }

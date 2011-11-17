@@ -70,6 +70,7 @@
   <ItemGroup>
     <Content Include="Scripts\FacebookConnect.js" />
     <Content Include="Styles\FacebookConnect.css" />
+    <Content Include="TextFile1.txt" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
@@ -122,6 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Placement.info" />
+    <Content Include="Views\FacebookConnectAuthenticated.cshtml" />
+    <Content Include="Views\FacebookConnectNotAuthenticated.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Parts\FacebookConnect.cshtml" />

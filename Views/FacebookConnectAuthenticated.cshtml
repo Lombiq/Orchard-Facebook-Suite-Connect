@@ -10,5 +10,5 @@
 <a href="" id="facebook-logout-link">
     @T("Logout from Facebook")</a>
 <script type="text/javascript">
-    $.facebookConnect.initializeLogout("@Model.ReturnUrl");
+    $.facebookConnect.initializeLogout("@Html.Raw(Model.ReturnUrl)");
 </script>

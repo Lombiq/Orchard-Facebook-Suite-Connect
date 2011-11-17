@@ -1,6 +1,5 @@
 ﻿<a href="" id="facebook-connect-link">
     @T("Connect with Facebook")</a>
 <script type="text/javascript">
-    $.facebookConnect.initializeLogin("@Model.ReturnUrl", "@Model.Permissions");
+    $.facebookConnect.initializeLogin("@Html.Raw(Model.ReturnUrl)", "@Model.Permissions");
 </script>
-@*<fb:login-button>@T("Connect with Facebook")</fb:login-button>*@

@@ -4,7 +4,7 @@
 
     if (!Model.IsAuthenticated)
     {
-        returnUrl = Url.RouteUrl("FacebookConnect", new { Permissions = Model.Permissions, OnlyAllowVerified = Model.OnlyAllowVerified, ReturnUrl = returnUrl });
+        returnUrl = Url.RouteUrl("FacebookConnect", new { ConnectId = Model.ConnectId, ReturnUrl = returnUrl });
     }
     else
     {

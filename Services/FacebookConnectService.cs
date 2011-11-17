@@ -19,6 +19,13 @@ using Piedone.Avatars.Models;
 
 namespace Piedone.Facebook.Suite.Services
 {
+    public enum FacebookConnectValidationKey
+    {
+        NotAuthenticated,
+        NoPermissionsGranted,
+        NotVerified
+    }
+
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
     public class FacebookConnectService : IFacebookConnectService, IValidatingService
     {
@@ -76,8 +83,8 @@ namespace Piedone.Facebook.Suite.Services
             // User is not authenticated on Facebook or hasn't connected to our app or hasn't granted the needed permissions.
             if (!IsAuthorized(permissions))
             {
-                if (!IsAuthenticated()) ValidationDictionary.AddError("notAuthenticated", T("User is not authenticated on Facebook."));
-                else ValidationDictionary.AddError("noPermissions", T("The requested permissions were not granted."));
+                if (!IsAuthenticated()) ValidationDictionary.AddError(FacebookConnectValidationKey.NotAuthenticated.ToString(), T("User is not authenticated on Facebook."));
+                else ValidationDictionary.AddError(FacebookConnectValidationKey.NoPermissionsGranted.ToString(), T("The requested permissions were not granted."));
 
                 return false;
             }
@@ -148,7 +155,7 @@ namespace Piedone.Facebook.Suite.Services
 
                     if (onlyAllowVerified && !dataMapper.IsVerified)
                     {
-                        ValidationDictionary.AddError("notVerified", T("User is not verified."));
+                        ValidationDictionary.AddError(FacebookConnectValidationKey.NotVerified.ToString(), T("User is not verified."));
                         return false;
                     }
 
