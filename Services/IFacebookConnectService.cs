@@ -1,19 +1,27 @@
 ﻿using Orchard;
 using Piedone.Facebook.Suite.Models;
-using Piedone.ServiceValidation.Dictionaries;
+using Piedone.ServiceValidation.ServiceInterfaces;
 
 namespace Piedone.Facebook.Suite.Services
 {
+    /// <summary>
+    /// Use these values to check the ValidationDictionary against errors
+    /// </summary>
+    public enum FacebookConnectValidationKey
+    {
+        NotAuthenticated,
+        NoPermissionsGranted,
+        NotVerified
+    }
+
     /// <summary>
     /// Describes the interface a Facebook Connect service should have
     /// 
     /// Any interaction with the Facebook Connect feature's content parts/types/records should happen here.
     /// Inherits from IDependency as Facebook authentication should be validated on a per-request basis.
     /// </summary>
-    public interface IFacebookConnectService : IDependency
+    public interface IFacebookConnectService : IDependency, IValidatingService<FacebookConnectValidationKey>
     {
-        IServiceValidationDictionary ValidationDictionary { get; }
-
         /// <summary>
         /// Checks if the user is connected to our Facebook app and is authenticated on Facebook
         /// </summary>

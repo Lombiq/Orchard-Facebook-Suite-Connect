@@ -13,21 +13,14 @@ using Orchard.Security;
 using Piedone.Avatars.Services;
 using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
-using Piedone.ServiceValidation.Dictionaries;
 using Piedone.ServiceValidation.ServiceInterfaces;
 using Piedone.Avatars.Models;
+using Piedone.ServiceValidation.ValidationDictionaries;
 
 namespace Piedone.Facebook.Suite.Services
 {
-    public enum FacebookConnectValidationKey
-    {
-        NotAuthenticated,
-        NoPermissionsGranted,
-        NotVerified
-    }
-
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookConnectService : IFacebookConnectService, IValidatingService
+    public class FacebookConnectService : IFacebookConnectService
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IMembershipService _membershipService;
@@ -35,7 +28,7 @@ namespace Piedone.Facebook.Suite.Services
         private readonly IFacebookSuiteService _facebookSuiteService;
         private readonly IAvatarsService _avatarsService;
 
-        public IServiceValidationDictionary ValidationDictionary { get; private set; }
+        public IServiceValidationDictionary<FacebookConnectValidationKey> ValidationDictionary { get; private set; }
         public ILogger Logger { get; set; }
         public Localizer T { get; set; }
 
@@ -43,10 +36,13 @@ namespace Piedone.Facebook.Suite.Services
             IAuthenticationService authenticationService,
             IMembershipService membershipService,
             IContentManager contentManager,
-            IServiceValidationDictionary validationDictionary,
+            //IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
             IFacebookSuiteService facebookSuiteService,
             IAvatarsService avatarsService)
         {
+            // This is necessary as generic dependencies are currently not resolved, see issue: http://orchard.codeplex.com/workitem/18141
+            var validationDictionary = new ServiceValidationDictionary<FacebookConnectValidationKey>();
+
             _authenticationService = authenticationService;
             _membershipService = membershipService;
             _contentManager = contentManager;
@@ -83,8 +79,8 @@ namespace Piedone.Facebook.Suite.Services
             // User is not authenticated on Facebook or hasn't connected to our app or hasn't granted the needed permissions.
             if (!IsAuthorized(permissions))
             {
-                if (!IsAuthenticated()) ValidationDictionary.AddError(FacebookConnectValidationKey.NotAuthenticated.ToString(), T("User is not authenticated on Facebook."));
-                else ValidationDictionary.AddError(FacebookConnectValidationKey.NoPermissionsGranted.ToString(), T("The requested permissions were not granted."));
+                if (!IsAuthenticated()) ValidationDictionary.AddError(FacebookConnectValidationKey.NotAuthenticated, T("User is not authenticated on Facebook."));
+                else ValidationDictionary.AddError(FacebookConnectValidationKey.NoPermissionsGranted, T("The requested permissions were not granted."));
 
                 return false;
             }
@@ -155,7 +151,7 @@ namespace Piedone.Facebook.Suite.Services
 
                     if (onlyAllowVerified && !dataMapper.IsVerified)
                     {
-                        ValidationDictionary.AddError(FacebookConnectValidationKey.NotVerified.ToString(), T("User is not verified."));
+                        ValidationDictionary.AddError(FacebookConnectValidationKey.NotVerified, T("User is not verified."));
                         return false;
                     }
 

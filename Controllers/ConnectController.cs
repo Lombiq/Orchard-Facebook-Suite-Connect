@@ -44,10 +44,10 @@ namespace Piedone.Facebook.Suite.Controllers
                             permissions: FacebookConnectHelper.PermissionSettingsToArray(settings.Permissions),
                             onlyAllowVerified: settings.OnlyAllowVerified))
             {
-                var errorMessages = new Dictionary<string, LocalizedString>(3);
-                errorMessages[FacebookConnectValidationKey.NoPermissionsGranted.ToString()] = T("You haven't granted the requested permissions. Therefore, we were unable to log you in.");
-                errorMessages[FacebookConnectValidationKey.NotAuthenticated.ToString()] = T("You're not logged in at Facebook.");
-                errorMessages[FacebookConnectValidationKey.NotVerified.ToString()] = T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account.");
+                var errorMessages = new Dictionary<FacebookConnectValidationKey, LocalizedString>(3);
+                errorMessages[FacebookConnectValidationKey.NoPermissionsGranted] = T("You haven't granted the requested permissions. Therefore, we were unable to log you in.");
+                errorMessages[FacebookConnectValidationKey.NotAuthenticated] = T("You're not logged in at Facebook.");
+                errorMessages[FacebookConnectValidationKey.NotVerified] = T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account.");
 
 
                 foreach (var error in _facebookConnectService.ValidationDictionary.Errors)
