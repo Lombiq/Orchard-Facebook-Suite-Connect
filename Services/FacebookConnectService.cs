@@ -170,6 +170,8 @@ namespace Piedone.Facebook.Suite.Services
                     facebookUserPart = authenticatedUser.As<FacebookUserPart>();
                     facebookUserPart = FacebookUserDataMapper.MapToFacebookUserPart(dataMapper, facebookUserPart);
 
+                    UpdateAvatarAsync(facebookUserPart);
+
                     forceSignIn(authenticatedUser);
                 }
                 catch (Exception e)
