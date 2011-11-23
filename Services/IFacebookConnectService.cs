@@ -1,6 +1,6 @@
 ﻿using Orchard;
 using Piedone.Facebook.Suite.Models;
-using Piedone.ServiceValidation.ServiceInterfaces;
+using Piedone.HelpfulLibraries.ServiceValidation.ServiceInterfaces;
 
 namespace Piedone.Facebook.Suite.Services
 {

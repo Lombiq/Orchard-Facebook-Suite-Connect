@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using System.Web;
 using Facebook.Web;
 using Orchard;
 using Orchard.ContentManagement; // For generic ContentManager methods
@@ -10,12 +10,12 @@ using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Security;
+using Orchard.Settings;
 using Piedone.Avatars.Services;
 using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
-using Piedone.ServiceValidation.ServiceInterfaces;
-using Piedone.Avatars.Models;
-using Piedone.ServiceValidation.ValidationDictionaries;
+using Piedone.HelpfulLibraries.ServiceValidation.ValidationDictionaries;
+using Piedone.HelpfulLibraries.Tasks;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -27,6 +27,7 @@ namespace Piedone.Facebook.Suite.Services
         private readonly IContentManager _contentManager;
         private readonly IFacebookSuiteService _facebookSuiteService;
         private readonly IAvatarsService _avatarsService;
+        private readonly ITaskFactory _taskFactory;
 
         public IServiceValidationDictionary<FacebookConnectValidationKey> ValidationDictionary { get; private set; }
         public ILogger Logger { get; set; }
@@ -38,7 +39,8 @@ namespace Piedone.Facebook.Suite.Services
             IContentManager contentManager,
             //IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
             IFacebookSuiteService facebookSuiteService,
-            IAvatarsService avatarsService)
+            IAvatarsService avatarsService,
+            ITaskFactory taskFactory)
         {
             // This is necessary as generic dependencies are currently not resolved, see issue: http://orchard.codeplex.com/workitem/18141
             var validationDictionary = new ServiceValidationDictionary<FacebookConnectValidationKey>();
@@ -49,6 +51,7 @@ namespace Piedone.Facebook.Suite.Services
             ValidationDictionary = validationDictionary;
             _facebookSuiteService = facebookSuiteService;
             _avatarsService = avatarsService;
+            _taskFactory = taskFactory;
 
             Logger = NullLogger.Instance; // Constructor injection of ILogger fails
             T = NullLocalizer.Instance;
@@ -216,17 +219,40 @@ namespace Piedone.Facebook.Suite.Services
             return GetFacebookUserPart(authenticatedUser.Id);
         }
 
+        class TaskContext
+        {
+            public string CurrentCulture { get; private set; }
+            public ISite CurrentSite { get; private set; }
+            public HttpContextBase HttpContext { get; private set; }
+
+            public TaskContext(WorkContext workContext)
+            {
+                CurrentCulture = workContext.CurrentCulture;
+                CurrentSite = workContext.CurrentSite;
+                //HttpContext = new HttpContextPlaceholder();
+                HttpContext = workContext.HttpContext;
+            }
+
+            public WorkContext Transcribe(WorkContext workContext)
+            {
+                workContext.CurrentCulture = CurrentCulture;
+                workContext.CurrentSite = CurrentSite;
+
+                return workContext;
+            }
+        }
+
         private void UpdateAvatarAsync(FacebookUserPart facebookUserPart)
         {
             if (String.IsNullOrEmpty(facebookUserPart.PictureLink)) return;
 
-            var avatarTask = new Task(() =>
-            {
-                var wc = new WebClient();
-                var pictureData = wc.DownloadData(facebookUserPart.PictureLink);
-                var stream = new MemoryStream(pictureData);
-                _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not.
-            });
+            var avatarTask = _taskFactory.Factory(() =>
+                {
+                    var wc = new WebClient();
+                    var pictureData = wc.DownloadData(facebookUserPart.PictureLink);
+                    var stream = new MemoryStream(pictureData);
+                    _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not.
+                });
             avatarTask.Start();
         }
     }

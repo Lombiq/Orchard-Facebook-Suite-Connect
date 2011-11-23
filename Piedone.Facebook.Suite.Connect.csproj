@@ -114,9 +114,9 @@
       <Project>{DA71C952-BB8A-4FCD-8EC5-0D9ACB71E436}</Project>
       <Name>Piedone.Facebook.Suite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Piedone.ServiceValidation\Piedone.ServiceValidation.csproj">
-      <Project>{61F06E9B-E06D-492E-BA19-3BF64A9F341A}</Project>
-      <Name>Piedone.ServiceValidation</Name>
+    <ProjectReference Include="..\Piedone.HelpfulLibraries\Piedone.HelpfulLibraries.csproj">
+      <Project>{EA61AD10-39D6-41A9-B12B-227F50C54158}</Project>
+      <Name>Piedone.HelpfulLibraries</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
