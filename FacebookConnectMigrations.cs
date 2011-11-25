@@ -18,7 +18,7 @@ namespace Piedone.Facebook.Suite.Migrations
 			);
 
             ContentDefinitionManager.AlterTypeDefinition("FacebookConnectWidget", cfg => cfg
-                .WithPart("FacebookConnectPart")
+                .WithPart(typeof(FacebookConnectPart).Name)
                 .WithPart("WidgetPart")
                 .WithPart("CommonPart")
                 .WithSetting("Stereotype", "Widget"));
@@ -34,12 +34,15 @@ namespace Piedone.Facebook.Suite.Migrations
                 .Column<string>("FacebookUserName")
                 .Column<string>("Gender")
                 .Column<int>("TimeZone")
-                .Column<int>("Locale")
+                .Column<string>("Locale")
                 .Column<bool>("IsVerified")
-            );
+            ).AlterTable(typeof(FacebookUserPartRecord).Name,
+                table => table
+                    .CreateIndex("FacebookUser", new string[] { "FacebookUserId" })
+                );
 
 
-            return 1;
+            return 4;
         }
 
         public int UpdateFrom1()
