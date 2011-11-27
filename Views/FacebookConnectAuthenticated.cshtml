@@ -1,14 +1,16 @@
-﻿<div id="current-facebook-user-profile">
+﻿<div class="piedone-facebook-suite-connect current-user-profile">
     <a href="@Model.CurrentUser.Link">
-        <img src="@Model.CurrentUser.PictureLink" id="current-facebook-user-picture" alt="@T("{0}'s profile picture", Model.CurrentUser.Name)" />
+        <img src="@Model.CurrentUser.PictureLink" class="piedone-facebook-suite-connect current-user-profile-picture" alt="@T("{0}'s profile picture", Model.CurrentUser.Name)" />
     </a>
-    <strong id="current-facebook-user-name">
+    <strong class="piedone-facebook-suite-connect current-user-name">
         @Model.CurrentUser.Name
     </strong>
 </div>
     
-<a href="" id="facebook-logout-link">
-    @T("Logout from Facebook")</a>
+<a href="" class="piedone-facebook-suite-connect facebook-logout-link">
+    @T("Logout from Facebook")
+</a>
+
 <script type="text/javascript">
     $.facebookConnect.initializeLogout("@Html.Raw(Model.ReturnUrl)");
 </script>

@@ -10,7 +10,7 @@ namespace Piedone.Facebook.Suite.Connect
         {
             var manifest = builder.Add();
             manifest.DefineScript("FacebookConnect").SetUrl("FacebookConnect.js").SetDependencies("FacebookSuite");
-            manifest.DefineStyle("FacebookConnect").SetUrl("FacebookConnect.css");
+            manifest.DefineStyle("FacebookConnect").SetUrl("piedone-facebook-suite-connect.css");
         }
     }
 }

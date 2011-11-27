@@ -25,5 +25,5 @@ else if (Model.IsConnected)
 }
 else
 {
-    @Html.ActionLink(T("Sign out to log in with Facebook").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { id = "sign-out-to-connect-with-facebook-link" } )
+    @Html.ActionLink(T("Sign out to log in with Facebook").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { @class = "piedone-facebook-suite-connect sign-out-to-connect-with-facebook-link" })
 }

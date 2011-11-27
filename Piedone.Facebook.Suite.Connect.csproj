@@ -69,7 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\FacebookConnect.js" />
-    <Content Include="Styles\FacebookConnect.css" />
+    <Content Include="Styles\piedone-facebook-suite-connect.css" />
     <Content Include="Readme.txt" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />

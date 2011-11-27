@@ -1,4 +1,6 @@
-﻿#facebook-connect-link, #sign-out-to-connect-with-facebook-link, #facebook-logout-link
+﻿.piedone-facebook-suite-connect.connect-link,
+.piedone-facebook-suite-connect.sign-out-to-connect-with-facebook-link,
+.piedone-facebook-suite-connect.facebook-logout-link
 {
     background: url("http://static.ak.fbcdn.net/rsrc.php/v1/yL/r/FGFbc80dUKj.png") no-repeat left -188px;
     display: inline-block;
@@ -10,18 +12,18 @@
 
 /* User profile
 ***************************************************************/
-#current-facebook-user-profile 
+.piedone-facebook-suite-connect.current-user-profile
 {
     margin: 0 0 10px 0;
 }
 
-    #current-facebook-user-picture 
+    .piedone-facebook-suite-connect.current-user-profile-picture
     {
         display: block;
         margin: 0 auto 10px auto;
     }
 
-    #current-facebook-user-name
+    .piedone-facebook-suite-connect.current-user-name
     {
         display: block;
         text-align: center;

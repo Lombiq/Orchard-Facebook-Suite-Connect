@@ -15,7 +15,7 @@ namespace Piedone.Facebook.Suite.Services
     }
 
     /// <summary>
-    /// Describes the interface a Facebook Connect service should have
+    /// Facebook Suite Connect services
     /// 
     /// Any interaction with the Facebook Connect feature's content parts/types/records should happen here.
     /// Inherits from IDependency as Facebook authentication should be validated on a per-request basis.
