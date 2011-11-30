@@ -37,14 +37,11 @@ namespace Piedone.Facebook.Suite.Services
             IAuthenticationService authenticationService,
             IMembershipService membershipService,
             IContentManager contentManager,
-            //IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
+            IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
             IFacebookSuiteService facebookSuiteService,
             IAvatarsService avatarsService,
             ITaskFactory taskFactory)
         {
-            // This is necessary as generic dependencies are currently not resolved, see issue: http://orchard.codeplex.com/workitem/18141
-            var validationDictionary = new ServiceValidationDictionary<FacebookConnectValidationKey>();
-
             _authenticationService = authenticationService;
             _membershipService = membershipService;
             _contentManager = contentManager;
