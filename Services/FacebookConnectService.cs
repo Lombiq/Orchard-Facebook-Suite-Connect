@@ -216,29 +216,6 @@ namespace Piedone.Facebook.Suite.Services
             return GetFacebookUserPart(authenticatedUser.Id);
         }
 
-        class TaskContext
-        {
-            public string CurrentCulture { get; private set; }
-            public ISite CurrentSite { get; private set; }
-            public HttpContextBase HttpContext { get; private set; }
-
-            public TaskContext(WorkContext workContext)
-            {
-                CurrentCulture = workContext.CurrentCulture;
-                CurrentSite = workContext.CurrentSite;
-                //HttpContext = new HttpContextPlaceholder();
-                HttpContext = workContext.HttpContext;
-            }
-
-            public WorkContext Transcribe(WorkContext workContext)
-            {
-                workContext.CurrentCulture = CurrentCulture;
-                workContext.CurrentSite = CurrentSite;
-
-                return workContext;
-            }
-        }
-
         private void UpdateAvatarAsync(FacebookUserPart facebookUserPart)
         {
             if (String.IsNullOrEmpty(facebookUserPart.PictureLink)) return;
