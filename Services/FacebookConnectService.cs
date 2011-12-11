@@ -105,8 +105,6 @@ namespace Piedone.Facebook.Suite.Services
             // We have previously saved the user's data
             if (facebookUserPart != null)
             {
-                forceSignIn(facebookUserPart.As<Orchard.Users.Models.UserPart>().As<IUser>());
-
                 UpdateAvatarAsync(facebookUserPart);
 
                 facebookClient.GetCompleted +=
@@ -140,6 +138,8 @@ namespace Piedone.Facebook.Suite.Services
                         }
                     };
                 facebookClient.GetAsync("me"); // Updating user data can run in the background
+
+                forceSignIn(facebookUserPart.As<Orchard.Users.Models.UserPart>().As<IUser>());
             }
             // We don't currently have the user's data
             else
@@ -156,7 +156,7 @@ namespace Piedone.Facebook.Suite.Services
                     }
 
                     // Does not need to verifiy user unicity as there can be more people with the same name.
-                    // Or maybe it would be clever to get the email too, so users will be guaranteedly unique.
+                    // Can lead to confusion, must rethink.
                     var random = new Random();
                     var authenticatedUser = _membershipService.CreateUser(
                         new CreateUserParams(
@@ -220,14 +220,23 @@ namespace Piedone.Facebook.Suite.Services
         {
             if (String.IsNullOrEmpty(facebookUserPart.PictureLink)) return;
 
-            var avatarTask = _taskFactory.Factory(() =>
-                {
-                    var wc = new WebClient();
-                    var pictureData = wc.DownloadData(facebookUserPart.PictureLink);
-                    var stream = new MemoryStream(pictureData);
-                    _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not.
-                });
-            avatarTask.Start();
+            using (var wc = new WebClient())
+            {
+                var backgroundAction = _taskFactory.BuildBackgroundAction(
+                    (result) =>
+                    {
+                        var pictureData = (byte[])result;
+                        var stream = new MemoryStream(pictureData);
+                        _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not
+                    });
+
+                wc.DownloadDataCompleted +=
+                    (sender, e) =>
+                    {
+                        backgroundAction(e.Result);
+                    };
+                wc.DownloadDataAsync(new Uri(facebookUserPart.PictureLink));
+            }
         }
     }
 }
