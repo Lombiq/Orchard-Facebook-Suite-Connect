@@ -16,6 +16,8 @@ using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
 using Piedone.HelpfulLibraries.ServiceValidation.ValidationDictionaries;
 using Piedone.HelpfulLibraries.Tasks;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -134,7 +136,6 @@ namespace Piedone.Facebook.Suite.Services
                         {
                             string message = "Error in retrieving Facebook user data: " + e.Error.Message;
                             Logger.Error(e.Error, message);
-                            // Maybe not wise to throw an exception here
                         }
                     };
                 facebookClient.GetAsync("me"); // Updating user data can run in the background
@@ -174,11 +175,11 @@ namespace Piedone.Facebook.Suite.Services
 
                     forceSignIn(authenticatedUser);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    string message = "Error in retrieving Facebook user data: " + e.Message;
-                    Logger.Error(e, message);
-                    throw new OrchardException(T(message), e); // Useless to localize
+                    string message = "Error in retrieving Facebook user data: " + ex.Message;
+                    Logger.Error(ex, message);
+                    throw new OrchardException(T(message), ex); // Useless to localize
                 }
             }
 
@@ -222,19 +223,21 @@ namespace Piedone.Facebook.Suite.Services
 
             using (var wc = new WebClient())
             {
-                var backgroundAction = _taskFactory.BuildBackgroundAction(
-                    (result) =>
-                    {
-                        var pictureData = (byte[])result;
-                        var stream = new MemoryStream(pictureData);
-                        _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not
-                    });
-
-                wc.DownloadDataCompleted +=
+                wc.DownloadDataCompleted += _taskFactory.BuildAsyncEventHandler<object, DownloadDataCompletedEventArgs>(
                     (sender, e) =>
                     {
-                        backgroundAction(e.Result);
-                    };
+                        if (e.Error == null)
+                        {
+                            var stream = new MemoryStream(e.Result);
+                            _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not
+                        }
+
+                        else
+                        {
+                            string message = "Downloading of Facebok profile picture failed: " + e.Error.Message;
+                            Logger.Error(e.Error, message);
+                        }
+                    }, false).Invoke;
                 wc.DownloadDataAsync(new Uri(facebookUserPart.PictureLink));
             }
         }
