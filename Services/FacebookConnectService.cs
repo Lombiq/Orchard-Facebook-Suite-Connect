@@ -29,7 +29,7 @@ namespace Piedone.Facebook.Suite.Services
         private readonly IContentManager _contentManager;
         private readonly IFacebookSuiteService _facebookSuiteService;
         private readonly IAvatarsService _avatarsService;
-        private readonly ITaskFactory _taskFactory;
+        private readonly IDetachedDelegateBuilder _taskFactory;
 
         public IServiceValidationDictionary<FacebookConnectValidationKey> ValidationDictionary { get; private set; }
         public ILogger Logger { get; set; }
@@ -42,7 +42,7 @@ namespace Piedone.Facebook.Suite.Services
             IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
             IFacebookSuiteService facebookSuiteService,
             IAvatarsService avatarsService,
-            ITaskFactory taskFactory)
+            IDetachedDelegateBuilder taskFactory)
         {
             _authenticationService = authenticationService;
             _membershipService = membershipService;
