@@ -120,7 +120,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Placement.info" />
+    <Content Include="Placement.info" />
     <Content Include="Views\FacebookConnectAuthenticated.cshtml" />
     <Content Include="Views\FacebookConnectNotAuthenticated.cshtml" />
   </ItemGroup>
