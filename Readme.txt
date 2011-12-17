@@ -1,3 +1,0 @@
-﻿Please make sure to update the dependencies too, as Service Validation Libraries has also been updated.
-If you choose to only allow verified Facebook users to register, make sure to warn your visitors somehow beforehand.
-After an unsuccessful login attempt the module adds error messages to the notification system. However notifications are not always displayed, depending on the theme. Typically notifications are not displayed on the home page, so if a user attempts to log in from the home page but is rejected, she/he won't see the messages. Please make sure to inspect your theme.
