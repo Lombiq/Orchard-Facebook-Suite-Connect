@@ -17,8 +17,10 @@ namespace Piedone.Facebook.Suite.Connect
 
         public IEnumerable<RouteDescriptor> GetRoutes()
         {
-            return new[] {
-                new RouteDescriptor {
+            return new[]
+            {
+                new RouteDescriptor
+                {
                     Name = "FacebookConnect",
                     Route = new Route(
                         "FacebookConnect",
