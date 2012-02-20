@@ -89,7 +89,7 @@ namespace Piedone.Facebook.Suite.Services
 
             // Now we know that the user is authenticated on Facebook and connected to our app.
 
-            FacebookUserPart facebookUserPart = GetFacebookUserPart(_facebookSuiteService.FacebookWebContext.UserId); // Check if we already have the user's data saved
+            var facebookUserPart = GetFacebookUserPart(_facebookSuiteService.FacebookWebContext.UserId); // Check if we already have the user's data saved
 
             var facebookClient = new FacebookWebClient(_facebookSuiteService.FacebookWebContext);
 
@@ -134,7 +134,7 @@ namespace Piedone.Facebook.Suite.Services
                         }
                         else
                         {
-                            string message = "Error in retrieving Facebook user data: " + e.Error.Message;
+                            var message = "Error in retrieving Facebook user data: " + e.Error.Message;
                             Logger.Error(e.Error, message);
                         }
                     };
@@ -177,7 +177,7 @@ namespace Piedone.Facebook.Suite.Services
                 }
                 catch (Exception ex)
                 {
-                    string message = "Error in retrieving Facebook user data: " + ex.Message;
+                    var message = "Error in retrieving Facebook user data: " + ex.Message;
                     Logger.Error(ex, message);
                     throw new OrchardException(T(message), ex); // Useless to localize
                 }
