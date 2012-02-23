@@ -4,7 +4,7 @@
 
     if (!Model.IsAuthenticated)
     {
-        returnUrl = Url.RouteUrl("FacebookConnect", new { ConnectId = Model.ConnectId, ReturnUrl = returnUrl });
+        returnUrl = Url.Action("Connect", "Connect", new { Area = "Piedone.Facebook.Suite.Connect", ConnectId = Model.ContentPart.Id, ReturnUrl = returnUrl });
     }
     else
     {
@@ -17,11 +17,11 @@
 }
 @if (!Model.IsAuthenticated)
 {
-    @Display(New.FacebookConnectNotAuthenticated(Permissions: Model.Permissions, ReturnUrl: returnUrl))
+    @Display(New.FacebookConnectNotAuthenticated(Permissions: Model.ContentPart.Permissions, ReturnUrl: returnUrl))
 }
 else if (Model.IsConnected)
 {
-    @Display(New.FacebookConnectAuthenticated(CurrentUser: Model.CurrentUser, ReturnUrl: returnUrl))
+    @Display(New.FacebookConnectAuthenticated(AuthenticatedFacebookUser: Model.AuthenticatedFacebookUser, ReturnUrl: returnUrl))
 }
 else
 {

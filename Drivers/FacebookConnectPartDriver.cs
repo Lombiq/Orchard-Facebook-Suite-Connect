@@ -7,7 +7,6 @@ using Orchard.Localization;
 using Orchard.Security;
 using Orchard.UI.Notify;
 using Piedone.Avatars.Models;
-using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
 
@@ -47,43 +46,27 @@ namespace Piedone.Facebook.Suite.Drivers
             return ContentShape("Parts_FacebookConnect",
                 () =>
                 {
-                    bool isAuthenticated = _authenticationService.GetAuthenticatedUser() != null;
-                    var currentFacebookUserPart = _facebookConnectService.GetAuthenticatedFacebookUserPart();
-                    bool isConnected = currentFacebookUserPart != null;
+                    var isAuthenticated = _authenticationService.GetAuthenticatedUser() != null;
+                    var isConnected = _facebookConnectService.IsAuthorized(part.Permissions) && _facebookConnectService.AuthenticatedFacebookUserIsSaved();
 
-                    dynamic CurrentUser = new ExpandoObject();
+                    IFacebookUser authenticatedFacebookUser = null;
 
-                    if (!isAuthenticated)
+                    if (!isAuthenticated && isConnected && part.AutoLogin)
                     {
-                        string[] permissions = FacebookConnectHelper.PermissionSettingsToArray(part.Permissions);
-
-                        if (part.AutoLogin)
-                        {
-                            isConnected = _facebookConnectService.Authorize(
-                                permissions: FacebookConnectHelper.PermissionSettingsToArray(part.Permissions),
-                                onlyAllowVerified: part.OnlyAllowVerified);
-                            // string loginUrl = "https://www.facebook.com/dialog/oauth?client_id=" +  _facebookSuiteService.FacebookSuiteSettingsPart.AppId + "&redirect_uri=YOUR_URL&scope=email,read_stream";
-                            if (isConnected)
-                            {
-                                currentFacebookUserPart = _facebookConnectService.GetAuthenticatedFacebookUserPart();
-                            }
-                        }
+                        authenticatedFacebookUser = _facebookConnectService.UpdateAuthenticatedFacebookUser();
+                        _authenticationService.SignIn(authenticatedFacebookUser.As<IUser>(), false);
+                        isAuthenticated = true;
+                        //CurrentUser.PictureLink = !String.IsNullOrEmpty(avatar.ImageUrl) ? avatar.ImageUrl : currentFacebookUserPart.PictureLink;
                     }
-
-                    if (isConnected)
+                    else if (isConnected)
                     {
-                        CurrentUser.Name = currentFacebookUserPart.Name;
-                        var avatar = currentFacebookUserPart.As<AvatarProfilePart>();
-                        CurrentUser.PictureLink = !String.IsNullOrEmpty(avatar.ImageUrl) ? avatar.ImageUrl : currentFacebookUserPart.PictureLink;
-                        CurrentUser.Link = currentFacebookUserPart.Link;
+                        authenticatedFacebookUser = _facebookConnectService.GetAuthenticatedFacebookUser();
                     }
 
                     return shapeHelper.Parts_FacebookConnect(
                                 IsAuthenticated: isAuthenticated,
                                 IsConnected: isConnected,
-                                ConnectId: part.Id,
-                                Permissions: part.Permissions,
-                                CurrentUser: CurrentUser);
+                                AuthenticatedFacebookUser: authenticatedFacebookUser);
                 });
         }
 

@@ -1,9 +1,11 @@
-﻿<div class="piedone-facebook-suite-connect current-user-profile">
-    <a href="@Model.CurrentUser.Link">
-        <img src="@Model.CurrentUser.PictureLink" class="piedone-facebook-suite-connect current-user-profile-picture" alt="@T("{0}'s profile picture", Model.CurrentUser.Name)" />
+﻿@using Piedone.Facebook.Suite.Models
+
+<div class="piedone-facebook-suite-connect current-user-profile">
+    <a href="@Model.AuthenticatedFacebookUser.Link">
+        <img src="@(((IFacebookUser)Model.AuthenticatedFacebookUser).GetPictureLink())" class="piedone-facebook-suite-connect current-user-profile-picture" alt="@T("{0}'s profile picture", Model.AuthenticatedFacebookUser.Name)" />
     </a>
     <strong class="piedone-facebook-suite-connect current-user-name">
-        @Model.CurrentUser.Name
+        @Model.AuthenticatedFacebookUser.Name
     </strong>
 </div>
     

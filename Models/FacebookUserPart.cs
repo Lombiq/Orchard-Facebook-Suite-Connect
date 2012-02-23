@@ -1,37 +1,16 @@
-﻿using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using Orchard.Environment.Extensions;
+using Orchard.ContentManagement;
+using Orchard.Security;
 
 namespace Piedone.Facebook.Suite.Models
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookUserPartRecord : ContentPartRecord
+    public class FacebookUserPart : ContentPart<FacebookUserPartRecord>, IFacebookUser
     {
-        //public virtual int UserId { get; set; }
-        public virtual long FacebookUserId { get; set; }
-        public virtual string Name { get; set; }
-        public virtual string FirstName { get; set; }
-        public virtual string LastName { get; set; }
-        public virtual string Link { get; set; }
-        public virtual string FacebookUserName { get; set; }
-        public virtual string Gender { get; set; }
-        public virtual int TimeZone { get; set; }
-        public virtual string Locale { get; set; }
-        public virtual bool IsVerified { get; set; }
-    }
-
-    [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookUserPart : ContentPart<FacebookUserPartRecord>
-    {
-        /// <summary>
-        /// The id of the corresponding User part.
-        /// </summary>
-        //public int UserId
-        //{
-        //    get { return Record.UserId; }
-        //    set { Record.UserId = value; }
-        //}
-
         public long FacebookUserId
         {
             get { return Record.FacebookUserId; }
@@ -60,11 +39,6 @@ namespace Piedone.Facebook.Suite.Models
         {
             get { return Record.Link; }
             set { Record.Link = value; }
-        }
-
-        public string PictureLink
-        {
-            get { return "http://graph.facebook.com/" + FacebookUserId + "/picture"; }
         }
 
         /// <summary>

@@ -1,0 +1,16 @@
+﻿@*@Html.ValidationSummary()*@
+
+@using (Html.BeginFormAntiForgeryPost())
+{
+    <fieldset>
+        <ol>
+            <li>
+                <label for="UserName">@T("Username:")</label>
+                @Html.TextBox("UserName")
+                @Html.ValidationMessage("UserName")
+                <span class="hint">@T("Choose a unique username for your account you can login to with your Facebook credentials.")</span>
+            </li>
+        </ol>
+    </fieldset>
+    <button type="submit">@T("Register with your Facebook account")</button>
+}

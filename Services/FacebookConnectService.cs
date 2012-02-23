@@ -12,12 +12,12 @@ using Orchard.Logging;
 using Orchard.Security;
 using Orchard.Settings;
 using Piedone.Avatars.Services;
-using Piedone.Facebook.Suite.Helpers;
 using Piedone.Facebook.Suite.Models;
 using Piedone.HelpfulLibraries.ServiceValidation.ValidationDictionaries;
 using Piedone.HelpfulLibraries.Tasks;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Piedone.Facebook.Suite.EventHandlers;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -25,32 +25,30 @@ namespace Piedone.Facebook.Suite.Services
     public class FacebookConnectService : IFacebookConnectService
     {
         private readonly IAuthenticationService _authenticationService;
-        private readonly IMembershipService _membershipService;
         private readonly IContentManager _contentManager;
         private readonly IFacebookSuiteService _facebookSuiteService;
-        private readonly IAvatarsService _avatarsService;
-        private readonly IDetachedDelegateBuilder _taskFactory;
+        private readonly IFacebookConnectEventHandler _eventHandler;
+        private readonly Lazy<FacebookWebClient> _facebookWebClient;
 
-        public IServiceValidationDictionary<FacebookConnectValidationKey> ValidationDictionary { get; private set; }
+        public long AuthenticatedFacebookUserId
+        {
+            get { return _facebookSuiteService.FacebookWebContext.UserId; }
+        }
+
         public ILogger Logger { get; set; }
         public Localizer T { get; set; }
 
         public FacebookConnectService(
             IAuthenticationService authenticationService,
-            IMembershipService membershipService,
             IContentManager contentManager,
-            IServiceValidationDictionary<FacebookConnectValidationKey> validationDictionary,
             IFacebookSuiteService facebookSuiteService,
-            IAvatarsService avatarsService,
-            IDetachedDelegateBuilder taskFactory)
+            IFacebookConnectEventHandler eventHandler)
         {
             _authenticationService = authenticationService;
-            _membershipService = membershipService;
             _contentManager = contentManager;
-            ValidationDictionary = validationDictionary;
             _facebookSuiteService = facebookSuiteService;
-            _avatarsService = avatarsService;
-            _taskFactory = taskFactory;
+            _eventHandler = eventHandler;
+            _facebookWebClient = new Lazy<FacebookWebClient>(() => new FacebookWebClient(_facebookSuiteService.FacebookWebContext));
 
             Logger = NullLogger.Instance; // Constructor injection of ILogger fails
             T = NullLocalizer.Instance;
@@ -73,173 +71,61 @@ namespace Piedone.Facebook.Suite.Services
             return _facebookSuiteService.FacebookWebContext.IsAuthorized(permissions);
         }
 
-        /// <inheritdoc/>
-        /// <seealso cref="FacebookConnectService.IsAuthorized()"/>
-        /// <exception cref="Orchard.OrchardException">Thrown if Facebook API calls fail.</exception>
-        public bool Authorize(string[] permissions = null, bool onlyAllowVerified = false)
+        // Esetleg bele egy IContent-be, és akkor az Update egyszerűbb?
+        public IFacebookUser FetchMe()
         {
-            // User is not authenticated on Facebook or hasn't connected to our app or hasn't granted the needed permissions.
-            if (!IsAuthorized(permissions))
+            if (!IsAuthenticated()) return null;
+
+            try
             {
-                if (!IsAuthenticated()) ValidationDictionary.AddError(FacebookConnectValidationKey.NotAuthenticated, T("User is not authenticated on Facebook."));
-                else ValidationDictionary.AddError(FacebookConnectValidationKey.NoPermissionsGranted, T("The requested permissions were not granted."));
+                dynamic me = _facebookWebClient.Value.Get("me");
 
-                return false;
+                var user = _contentManager.New<FacebookUserPart>("User");
+
+                user.FacebookUserId = long.Parse(me.id);
+                user.Name = me.name;
+                user.FirstName = me.first_name;
+                user.LastName = me.last_name;
+                //user.Email =  me.email ?? "";
+                user.Link = me.link;
+                user.FacebookUserName = me.username ?? "";
+                user.Gender = me.gender;
+                user.TimeZone = (int)me.timezone;
+                user.Locale = ((string)me.locale).Replace('_', '-'); // Making locale Orchard-compatible
+                user.IsVerified = (me.verified != null) ? me.verified : false; // Maybe it is possible that verified is set, but is false -> don't take automatically as true if it's set
+
+                return user;
             }
-
-            // Now we know that the user is authenticated on Facebook and connected to our app.
-
-            var facebookUserPart = GetFacebookUserPart(_facebookSuiteService.FacebookWebContext.UserId); // Check if we already have the user's data saved
-
-            var facebookClient = new FacebookWebClient(_facebookSuiteService.FacebookWebContext);
-
-            Action<IUser> forceSignIn =
-                u =>
-                {
-                    _authenticationService.SignOut();
-                    _authenticationService.SignIn(
-                        u,
-                        true);
-                };
-
-            dynamic me = "";
-
-            // We have previously saved the user's data
-            if (facebookUserPart != null)
+            catch (Exception ex)
             {
-                UpdateAvatarAsync(facebookUserPart);
-
-                facebookClient.GetCompleted +=
-                    (sender, e) =>
-                    {
-                        if (e.Error == null)
-                        {
-                            me = e.GetResultData();
-
-                            // It is not handled if the user's name changed
-                            //bool nameHasChanged = fbUserPart.Name != me.name;
-
-                            // Update saved user
-                            facebookUserPart = FacebookUserDataMapper.MapToFacebookUserPart(
-                                new FacebookUserDataMapper(me),
-                                facebookUserPart);
-                            _contentManager.Flush(); // Else the update would not commit.
-
-                            //if (nameHasChanged)
-                            //{
-                            //    var userPart = _contentManager.Get<Orchard.Users.Models.UserPart>(fbUserPart.UserId);
-                            //    userPart.UserName = fbUserPart.Name;
-                            //    userPart.NormalizedUserName = fbUserPart.Name.ToLowerInvariant(); // This is taken from the implementation, but should really be in a method of MembershipService 
-                            //}
-                        }
-                        else
-                        {
-                            var message = "Error in retrieving Facebook user data: " + e.Error.Message;
-                            Logger.Error(e.Error, message);
-                        }
-                    };
-                facebookClient.GetAsync("me"); // Updating user data can run in the background
-
-                forceSignIn(facebookUserPart.As<Orchard.Users.Models.UserPart>().As<IUser>());
+                throw new OrchardException(T("Error in retrieving Facebook user data: " + ex.Message), ex); // Useless to localize
             }
-            // We don't currently have the user's data
-            else
-            {
-                try
-                {
-                    me = facebookClient.Get("me"); // First login should run synchronously to get user data
-                    var dataMapper = new FacebookUserDataMapper(me);
-
-                    if (onlyAllowVerified && !dataMapper.IsVerified)
-                    {
-                        ValidationDictionary.AddError(FacebookConnectValidationKey.NotVerified, T("User is not verified."));
-                        return false;
-                    }
-
-                    // Does not need to verifiy user unicity as there can be more people with the same name.
-                    // Can lead to confusion, must rethink.
-                    var random = new Random();
-                    var authenticatedUser = _membershipService.CreateUser(
-                        new CreateUserParams(
-                            dataMapper.Name,
-                            random.Next().ToString(),
-                            dataMapper.Email,
-                            "",
-                            "",
-                            true));
-
-                    facebookUserPart = authenticatedUser.As<FacebookUserPart>();
-                    facebookUserPart = FacebookUserDataMapper.MapToFacebookUserPart(dataMapper, facebookUserPart);
-
-                    UpdateAvatarAsync(facebookUserPart);
-
-                    forceSignIn(authenticatedUser);
-                }
-                catch (Exception ex)
-                {
-                    var message = "Error in retrieving Facebook user data: " + ex.Message;
-                    Logger.Error(ex, message);
-                    throw new OrchardException(T(message), ex); // Useless to localize
-                }
-            }
-
-            return true;
         }
 
-        /// <inheritdoc/>
-        public FacebookUserPart GetFacebookUserPart(long facebookId)
+        public void UpdateFacebookUser(IUser user, IFacebookUser facebookUser)
+        {
+            var part = user.As<FacebookUserPart>();
+
+            // Could this be better, e.g. with Automapper?
+            part.FacebookUserId = facebookUser.FacebookUserId;
+            part.FacebookUserName = facebookUser.FacebookUserName;
+            part.FirstName = facebookUser.FirstName;
+            part.Gender = facebookUser.Gender;
+            part.IsVerified = facebookUser.IsVerified;
+            part.LastName = facebookUser.LastName;
+            part.Link = facebookUser.Link;
+            part.Locale = facebookUser.Locale;
+            part.Name = facebookUser.Name;
+            part.TimeZone = facebookUser.TimeZone;
+
+            _eventHandler.UserUpdated(user.As<IFacebookUser>());
+        }
+
+        public IFacebookUser GetFacebookUser(long facebookId)
         {
             return _contentManager
                 .Query<FacebookUserPart, FacebookUserPartRecord>()
                 .Where(u => u.FacebookUserId == facebookId).List().FirstOrDefault<FacebookUserPart>();
-        }
-
-        /// <inheritdoc/>
-        public FacebookUserPart GetFacebookUserPart(int id)
-        {
-            var part = _contentManager
-                .Query<FacebookUserPart, FacebookUserPartRecord>()
-                .Where(u => u.Id == id).List().FirstOrDefault<FacebookUserPart>();
-
-            // This happens if one is logged in at FB and in Orchard, but here not with FB creditentials.
-            // Since FacebookUserPart is attached to the User type, an empty FacebookUserPart record will be created.
-            if (part != null && part.FacebookUserId == 0) return null;
-            return part;
-        }
-
-        /// <inheritdoc/>
-        public FacebookUserPart GetAuthenticatedFacebookUserPart()
-        {
-            // _authenticationService.GetAuthenticatedUser().As<FacebookUserPart>(); would
-            // return an empty object, under some circumstances, see GetFacebookUserPart(int id).
-            var authenticatedUser = _authenticationService.GetAuthenticatedUser();
-            if (authenticatedUser == null) return null;
-            return GetFacebookUserPart(authenticatedUser.Id);
-        }
-
-        private void UpdateAvatarAsync(FacebookUserPart facebookUserPart)
-        {
-            if (String.IsNullOrEmpty(facebookUserPart.PictureLink)) return;
-
-            using (var wc = new WebClient())
-            {
-                wc.DownloadDataCompleted += _taskFactory.BuildAsyncEventHandler<object, DownloadDataCompletedEventArgs>(
-                    (sender, e) =>
-                    {
-                        if (e.Error == null)
-                        {
-                            var stream = new MemoryStream(e.Result);
-                            _avatarsService.SaveAvatarFile(facebookUserPart.Id, stream, "jpg"); // We could look at the bytes to detect the file type, but rather not
-                        }
-
-                        else
-                        {
-                            string message = "Downloading of Facebok profile picture failed: " + e.Error.Message;
-                            Logger.Error(e.Error, message);
-                        }
-                    }, false).Invoke;
-                wc.DownloadDataAsync(new Uri(facebookUserPart.PictureLink));
-            }
         }
     }
 }

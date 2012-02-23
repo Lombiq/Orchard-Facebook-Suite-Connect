@@ -1,6 +1,10 @@
 ﻿using Orchard;
 using Piedone.Facebook.Suite.Models;
 using Piedone.HelpfulLibraries.ServiceValidation.ServiceInterfaces;
+using Orchard.Security;
+using System;
+using System.Linq;
+using Orchard.ContentManagement;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -20,8 +24,13 @@ namespace Piedone.Facebook.Suite.Services
     /// Any interaction with the Facebook Connect feature's content parts/types/records should happen here.
     /// Inherits from IDependency as Facebook authentication should be validated on a per-request basis.
     /// </summary>
-    public interface IFacebookConnectService : IDependency, IValidatingService<FacebookConnectValidationKey>
+    public interface IFacebookConnectService : IDependency
     {
+        /// <summary>
+        /// Facebook UserId of the currently authenticated Facebok user
+        /// </summary>
+        long AuthenticatedFacebookUserId { get; }
+
         /// <summary>
         /// Checks if the user is connected to our Facebook app and is authenticated on Facebook
         /// </summary>
@@ -34,28 +43,81 @@ namespace Piedone.Facebook.Suite.Services
         bool IsAuthorized(string[] permissions = null);
 
         /// <summary>
-        /// Tries to authenticate the user with Facebook and authorize against permissions as well as authenticates
-        /// the user with Orchard. Returns true on success.
+        /// Fetches the currently authenticated user's profile data from Facebook
         /// </summary>
-        /// <param name="permissions">An array of Facebook permissions to authorize against.</param>
-        /// <param name="onlyAllowVerified">If true, only verified Facebook users will be authenticated.</param>
-        bool Authorize(string[] permissions = null, bool onlyAllowVerified = false);
+        IFacebookUser FetchMe();
+
+        /// <summary>
+        /// Updates a local user with Facebook user profile data
+        /// </summary>
+        /// <param name="user">The local user</param>
+        /// <param name="facebookUser">The Facebook user profile data</param>
+        void UpdateFacebookUser(IUser user, IFacebookUser facebookUser);
 
         /// <summary>
         /// Gets data of a saved Facebook user profile
         /// </summary>
         /// <param name="facebookId">The numerical ID of the Facebook profile</param>
-        FacebookUserPart GetFacebookUserPart(long facebookId);
+        IFacebookUser GetFacebookUser(long facebookId);
+    }
+
+    public static class FacebookConnectServiceExtensions
+    {
+        /// <summary>
+        /// Converts a comma-delimited string of Facebook permissions to an array
+        /// </summary>
+        /// <param name="permissions">The permissions string</param>
+        public static bool IsAuthorized(this IFacebookConnectService service, string permissions)
+        {
+            string[] permissionArray = new string[0];
+            if (permissions != null)
+            {
+                permissionArray = permissions.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                permissionArray = (from p in permissionArray select p.Trim()).ToArray();
+            }
+
+            return service.IsAuthorized(permissionArray);
+        }
 
         /// <summary>
-        /// Gets data of a saved Facebook user profile
+        /// Checks if the currently authenticated Facebook user's profile data is saved to a local user profile
         /// </summary>
-        /// <param name="id">The id of the part (the same as the corresponding user part)</param>
-        FacebookUserPart GetFacebookUserPart(int id);
+        public static bool AuthenticatedFacebookUserIsSaved(this IFacebookConnectService service)
+        {
+            return service.GetFacebookUser(service.AuthenticatedFacebookUserId) != null;
+        }
 
         /// <summary>
         /// Gets the current authenticated user's Facebook user profile data
         /// </summary>
-        FacebookUserPart GetAuthenticatedFacebookUserPart();
+        public static IFacebookUser GetAuthenticatedFacebookUser(this IFacebookConnectService service)
+        {
+            // _authenticationService.GetAuthenticatedUser().As<FacebookUserPart>(); would
+            // return an empty object, under some circumstances, see GetFacebookUserPart(int id).
+            //var authenticatedUser = _authenticationService.GetAuthenticatedUser();
+            //if (authenticatedUser == null) return null;
+
+            var facebookUser = service.GetFacebookUser(service.AuthenticatedFacebookUserId);
+
+            // This happens if one is logged in at FB and in Orchard, but here not with FB creditentials.
+            // Since FacebookUserPart is attached to the User type, an empty FacebookUserPart record will be created if the User exists.
+            if (facebookUser != null && facebookUser.FacebookUserId == 0) return null;
+
+            return facebookUser;
+        }
+
+        /// <summary>
+        /// Updates the currently authenticated Facebook user's local profile with fresh profile data from Facebook
+        /// </summary>
+        /// <returns>The updated </returns>
+        public static IFacebookUser UpdateAuthenticatedFacebookUser(this IFacebookConnectService service)
+        {
+            var facebookUser = GetAuthenticatedFacebookUser(service);
+
+            if (facebookUser == null) return null;
+            service.UpdateFacebookUser(facebookUser.As<IUser>(), service.FetchMe());
+
+            return facebookUser;
+        }
     }
 }
