@@ -1,6 +1,6 @@
 ﻿@*@Html.ValidationSummary()*@
 
-@using (Html.BeginFormAntiForgeryPost())
+@using (Html.BeginFormAntiForgeryPost("SimpleRegistration", FormMethod.Post))
 {
     <fieldset>
         <ol>

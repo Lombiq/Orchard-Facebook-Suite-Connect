@@ -8,17 +8,19 @@ using Orchard.ContentManagement.Records;
 namespace Piedone.Facebook.Suite.Models
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookConnectPartRecord : ContentPartRecord
+    public class FacebookConnectSettingsPartRecord : ContentPartRecord, IFacebookConnectSettings
     {
         public virtual string Permissions { get; set; }
         public virtual bool AutoLogin { get; set; }
         public virtual bool OnlyAllowVerified { get; set; }
+        public virtual bool SimpleRegistration { get; set; }
 
-        public FacebookConnectPartRecord()
+        public FacebookConnectSettingsPartRecord()
         {
             Permissions = "";
             AutoLogin = false;
             OnlyAllowVerified = false;
+            SimpleRegistration = false;
         }
     }
 }

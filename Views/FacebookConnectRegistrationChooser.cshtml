@@ -1,0 +1,12 @@
+﻿@{
+    Style.Require("FacebookConnect");
+}
+
+<div id="facebook-connect-simple-registration" class="piedone-facebook-suite-connect registration-chooser">
+    @Html.ActionLink(T("Simple registration").ToString(), "SimpleRegistration", "Connect", new { Area = "Piedone.Facebook.Suite.Connect", ReturnUrl = Model.ReturnUrl }, new { @class = "button" })
+    <span class="hint">@T("You only have to choose a username, but later you can only login with your Facebook account.")</span>
+</div>
+<div id="facebook-connect-full-registration" class="piedone-facebook-suite-connect registration-chooser">
+@Html.ActionLink(T("Full registration").ToString(), "Register", "Account", new { Area = "Orchard.Users" }, new { @class = "button" })
+<span class="hint">@T("You'll have to fill out the complete (actually quite short) registration form to register, but you'll be able to log in with your Facebook account. Choose this if you plan to log in later with username/password instead of your Facebook account.")</span>
+</div>

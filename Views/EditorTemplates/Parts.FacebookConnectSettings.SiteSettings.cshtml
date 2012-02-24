@@ -1,7 +1,10 @@
-﻿@model Piedone.Facebook.Suite.Models.FacebookConnectPart
+﻿@model Piedone.Facebook.Suite.Models.FacebookConnectSettingsPart
 <fieldset>
-    <legend>@T("Facebook Connect Widget Settings")</legend>
-    <span class="hint">@T("For the best experience, place this widget in a layer that both authenticated and anonymous users can see.")</span>
+    <legend>@T("Facebook Connect Settings")</legend>
+    <span class="hint">
+        @T("For the best experience, place this widget in a layer that both authenticated and anonymous users can see.")<br />
+        @T("WARNING: new users will only be able to connect if registration is enabled. Otherwise only existing users will be able to login.")
+    </span>
     <ol>
         <li>
             @Html.LabelFor(model => model.Permissions, T("Permissions"))
@@ -20,6 +23,12 @@
             <label for="@Html.FieldIdFor(m => m.OnlyAllowVerified)" class="forcheckbox">@T("Only allow verified users")</label>
             @Html.ValidationMessageFor(m => m.OnlyAllowVerified)
             <span class="hint">@T("If checked, only verified Facebook users will get authenticated.")</span>
+        </li>
+        <li>
+            @Html.EditorFor(m => m.SimpleRegistration)
+            <label for="@Html.FieldIdFor(m => m.SimpleRegistration)" class="forcheckbox">@T("Simple registration")</label>
+            @Html.ValidationMessageFor(m => m.SimpleRegistration)
+            <span class="hint">@T("If checked, new users will only be prompted for a user name when registering. This means that they won't be able to login with the built-in authentication form (only with their Facebook-account) and won't have an e-mail saved.")</span>
         </li>
     </ol>
 </fieldset>

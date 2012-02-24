@@ -13,6 +13,7 @@ using Orchard.Users.Services;
 using System;
 using Orchard.Security;
 using Orchard.Themes;
+using Orchard.Settings;
 
 namespace Piedone.Facebook.Suite.Controllers
 {
@@ -22,6 +23,7 @@ namespace Piedone.Facebook.Suite.Controllers
     public class ConnectController : Controller
     {
         private readonly IOrchardServices _orchardServices;
+        private readonly ISiteService _siteService;
         private readonly IFacebookConnectService _facebookConnectService;
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authenticationService;
@@ -32,13 +34,15 @@ namespace Piedone.Facebook.Suite.Controllers
 
         public ConnectController(
             IOrchardServices orchardServices,
+            ISiteService siteService,
             IFacebookConnectService facebookConnectService,
             IUserService userService,
-            IAuthenticationService authenticationService, 
+            IAuthenticationService authenticationService,
             IMembershipService membershipService,
             INotifier notifier)
         {
             _orchardServices = orchardServices;
+            _siteService = siteService;
             _facebookConnectService = facebookConnectService;
             _userService = userService;
             _authenticationService = authenticationService;
@@ -48,50 +52,62 @@ namespace Piedone.Facebook.Suite.Controllers
             T = NullLocalizer.Instance;
         }
 
-        public ActionResult Connect(int connectId, string returnUrl = "")
+        public ActionResult Connect(string returnUrl = "")
         {
-            if (IsAuthorized(connectId))
+            var settings = GetSettings();
+            var facebookUser = _facebookConnectService.FetchMe();
+
+            if (ValidateUser(facebookUser))
             {
                 if (_facebookConnectService.AuthenticatedFacebookUserIsSaved())
                 {
-                    var facebookUser = _facebookConnectService.UpdateAuthenticatedFacebookUser();
-                    _authenticationService.SignIn(facebookUser.As<IUser>(), false);
+                    var user = _facebookConnectService.UpdateAuthenticatedFacebookUser(facebookUser);
+                    _authenticationService.SignIn(user.As<IUser>(), false);
                 }
                 // With this existing users can attach their FB account to their local accounts
                 else if (_authenticationService.IsAuthenticated())
                 {
-                    _facebookConnectService.UpdateFacebookUser(_authenticationService.GetAuthenticatedUser(), _facebookConnectService.FetchMe());
+                    _facebookConnectService.UpdateFacebookUser(_authenticationService.GetAuthenticatedUser(), facebookUser);
                 }
-                else return RegistrationForm();
+                else if (settings.SimpleRegistration)
+                {
+                    return new ShapeResult(this, _orchardServices.New.FacebookConnectRegistrationChooser(ReturnUrl: returnUrl));
+                }
+                else return this.RedirectLocal(Url.Action("Register", "Account", new { Area = "Orchard.Users" }));
             }
-            else _notifier.Error(T("You're not logged in at Facebook or you haven't granted the requested permissions. Therefore, we were unable to log you in."));
-
 
             return this.RedirectLocal(returnUrl); // "this" is necessary, as this is from an extension (Orchard.Mvc.Extensions.ControllerExtensions)
         }
 
-        [HttpPost]
-        public ActionResult Connect(string userName, int connectId, string returnUrl = "")
+        public ActionResult SimpleRegistration(string returnUrl = "")
         {
-            // This a notably elegant solution for not checking the e-mail :-). We don't require e-mail from Facebook users currently.
+            return SimpleRegistrationForm();
+        }
+
+        [HttpPost]
+        public ActionResult SimpleRegistration(string userName, string returnUrl = "")
+        {
+            var settings = GetSettings();
+
+            if (!settings.SimpleRegistration)
+            {
+                // Only adventurers who experiemnt will ever see this.
+                _notifier.Error(T("Simple registration is not allowed on this site"));
+                return this.RedirectLocal(returnUrl);
+            }
+
+            // This a notably elegant solution for not checking the e-mail :-). We don't require e-mail with simple registrations.
             if (!_userService.VerifyUserUnicity(userName, "dféfdéfdkék342ü45ü43ü453578"))
             {
                 // Notifier or validation summary. 
                 _notifier.Error(T("The username you tried to register is taken. Please choose another one."));
                 //ModelState.AddModelError("userExists", T("The username you tried to register is taken. Please choose another one."));
-                return RegistrationForm();
+                return SimpleRegistrationForm();
             }
-
-            var settings = GetSettings(connectId);
 
             var facebookUser = _facebookConnectService.FetchMe();
 
-            if (settings.OnlyAllowVerified && !facebookUser.IsVerified)
-            {
-                _notifier.Error(T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account."));
-                //ModelState.AddModelError("notVerified", T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account."));
-                return RegistrationForm();
-            }
+            if (!ValidateUser(facebookUser)) return SimpleRegistrationForm();
 
             var random = new Random();
             var user = _membershipService.CreateUser(
@@ -110,19 +126,40 @@ namespace Piedone.Facebook.Suite.Controllers
             return this.RedirectLocal(returnUrl);
         }
 
-        private ShapeResult RegistrationForm()
+        private ShapeResult SimpleRegistrationForm()
         {
-            return new ShapeResult(this, _orchardServices.New.FacebookConnectRegistration());
+            return new ShapeResult(this, _orchardServices.New.FacebookConnectSimpleRegistration());
         }
 
-        private bool IsAuthorized(int connectId)
+        private FacebookConnectSettingsPart GetSettings()
         {
-            return _facebookConnectService.IsAuthorized(GetSettings(connectId).Permissions);
+            return _siteService.GetSiteSettings().As<FacebookConnectSettingsPart>();
         }
 
-        private FacebookConnectPart GetSettings(int connectId)
+        private bool ValidateUser(IFacebookUser facebookUser)
         {
-            return _orchardServices.ContentManager.Get<FacebookConnectPart>(connectId);
+            IEnumerable<FacebookConnectValidationKey> errors;
+            if (!_facebookConnectService.UserIsValid(facebookUser, GetSettings(), out errors))
+            {
+                foreach (var error in errors)
+                {
+                    switch (error)
+                    {
+                        case FacebookConnectValidationKey.NoPermissionsGranted:
+                            _notifier.Error(T("You haven't granted the requested permissions."));
+                            //ModelState.AddModelError("notVerified", T("You haven't granted the requested permissions."));
+                            break;
+                        case FacebookConnectValidationKey.NotVerified:
+                            _notifier.Error(T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account."));
+                            //ModelState.AddModelError("notVerified", T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account."));
+                            break;
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

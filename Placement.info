@@ -1,5 +1,4 @@
 ﻿<Placement>
-  <!--Connect-->
-  <Place Parts_FacebookConnect_Edit="Content:7.5"/>
-  <Place Parts_FacebookConnect="Content:10"/>
+  <Place Parts_FacebookConnectSettings_SiteSettings="Content:11"/>
+  <Place Parts_FacebookConnectWidget="Content:10"/>
 </Placement>

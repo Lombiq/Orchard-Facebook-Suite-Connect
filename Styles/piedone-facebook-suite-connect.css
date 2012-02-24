@@ -10,6 +10,18 @@
     line-height: 22px;
 }
 
+.registration-chooser
+{
+    margin-bottom: 3em;
+}
+
+    .registration-chooser .button
+    {
+        display: block;
+        margin-bottom: 1em !important;
+        padding: 0.5em !important;
+    }
+
 /* User profile
 ***************************************************************/
 .piedone-facebook-suite-connect.current-user-profile

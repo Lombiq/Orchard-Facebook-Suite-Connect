@@ -5,7 +5,7 @@ using Orchard.Environment.Extensions;
 namespace Piedone.Facebook.Suite.Models
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookConnectPart : ContentPart<FacebookConnectPartRecord>
+    public class FacebookConnectSettingsPart : ContentPart<FacebookConnectSettingsPartRecord>, IFacebookConnectSettings
     {
         public string Permissions
         {
@@ -23,6 +23,12 @@ namespace Piedone.Facebook.Suite.Models
         {
             get { return Record.OnlyAllowVerified; }
             set { Record.OnlyAllowVerified = value; }
+        }
+
+        public bool SimpleRegistration
+        {
+            get { return Record.SimpleRegistration; }
+            set { Record.SimpleRegistration = value; }
         }
     }
 }

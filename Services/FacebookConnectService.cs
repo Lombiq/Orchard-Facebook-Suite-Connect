@@ -102,6 +102,19 @@ namespace Piedone.Facebook.Suite.Services
             }
         }
 
+        public bool UserIsValid(IFacebookUser facebookUser, IFacebookConnectSettings settings, out IEnumerable<FacebookConnectValidationKey> errors)
+        {
+            var errorsList = new List<FacebookConnectValidationKey>();
+            
+
+            if (!String.IsNullOrEmpty(settings.Permissions) && !this.IsAuthorized(settings.Permissions)) errorsList.Add(FacebookConnectValidationKey.NoPermissionsGranted);
+            if (settings.OnlyAllowVerified && !facebookUser.IsVerified) errorsList.Add(FacebookConnectValidationKey.NotVerified);
+
+            errors = errorsList;
+
+            return errorsList.Count == 0;
+        }
+
         public void UpdateFacebookUser(IUser user, IFacebookUser facebookUser)
         {
             var part = user.As<FacebookUserPart>();

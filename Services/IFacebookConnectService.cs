@@ -5,6 +5,7 @@ using Orchard.Security;
 using System;
 using System.Linq;
 using Orchard.ContentManagement;
+using System.Collections.Generic;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -13,7 +14,6 @@ namespace Piedone.Facebook.Suite.Services
     /// </summary>
     public enum FacebookConnectValidationKey
     {
-        NotAuthenticated,
         NoPermissionsGranted,
         NotVerified
     }
@@ -46,6 +46,13 @@ namespace Piedone.Facebook.Suite.Services
         /// Fetches the currently authenticated user's profile data from Facebook
         /// </summary>
         IFacebookUser FetchMe();
+
+        /// <summary>
+        /// Checks if the user is valid to be connected, depending on the provided settings
+        /// </summary>
+        /// <param name="facebookUser">The Facebook user to check</param>
+        /// <param name="settings">The settings to validate against</param>
+        bool UserIsValid(IFacebookUser facebookUser, IFacebookConnectSettings settings, out IEnumerable<FacebookConnectValidationKey> errors);
 
         /// <summary>
         /// Updates a local user with Facebook user profile data
@@ -98,13 +105,16 @@ namespace Piedone.Facebook.Suite.Services
         /// <summary>
         /// Updates the currently authenticated Facebook user's local profile with fresh profile data from Facebook
         /// </summary>
-        /// <returns>The updated </returns>
-        public static IFacebookUser UpdateAuthenticatedFacebookUser(this IFacebookConnectService service)
+        /// <param name="newData">Data to update the profile with. If not set, fresh data will be fetched from Facebook.</param>
+        /// <returns>The updated user</returns>
+        public static IFacebookUser UpdateAuthenticatedFacebookUser(this IFacebookConnectService service, IFacebookUser newData = null)
         {
             var facebookUser = GetAuthenticatedFacebookUser(service);
 
             if (facebookUser == null) return null;
-            service.UpdateFacebookUser(facebookUser.As<IUser>(), service.FetchMe());
+
+            if (newData == null) newData = service.FetchMe();
+            service.UpdateFacebookUser(facebookUser.As<IUser>(), newData);
 
             return facebookUser;
         }

@@ -2,31 +2,34 @@ using Orchard.ContentManagement.MetaData;
 using Orchard.Data.Migration;
 using Orchard.Environment.Extensions;
 using Piedone.Facebook.Suite.Models;
+using Orchard.ContentManagement;
 
 namespace Piedone.Facebook.Suite.Migrations
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
-    public class FacebookConnectMigrations : DataMigrationImpl {
-
-        public int Create() {
-			// Creating table FacebookConnectPartRecord
-			SchemaBuilder.CreateTable(typeof(FacebookConnectPartRecord).Name, 
+    public class FacebookConnectMigrations : DataMigrationImpl
+    {
+        public int Create()
+        {
+            // Creating table FacebookConnectPartRecord
+            SchemaBuilder.CreateTable(typeof(FacebookConnectSettingsPartRecord).Name,
                 table => table
-				    .ContentPartRecord()
-				    .Column<string>("Permissions")
+                    .ContentPartRecord()
+                    .Column<string>("Permissions")
                     .Column<bool>("AutoLogin")
                     .Column<bool>("OnlyAllowVerified")
-			);
+                    .Column<bool>("SimpleRegistration")
+            );
 
-            ContentDefinitionManager.AlterTypeDefinition("FacebookConnectWidget", 
+            ContentDefinitionManager.AlterTypeDefinition("FacebookConnectWidget",
                 cfg => cfg
-                    .WithPart(typeof(FacebookConnectPart).Name)
+                    .WithPart(typeof(FacebookConnectWidgetPart).Name)
                     .WithPart("WidgetPart")
                     .WithPart("CommonPart")
                     .WithSetting("Stereotype", "Widget"));
 
             // Creating table FacebookUserPartRecord
-            SchemaBuilder.CreateTable(typeof(FacebookUserPartRecord).Name, 
+            SchemaBuilder.CreateTable(typeof(FacebookUserPartRecord).Name,
                 table => table
                     .ContentPartRecord()
                     .Column<long>("FacebookUserId")
@@ -45,7 +48,7 @@ namespace Piedone.Facebook.Suite.Migrations
                 );
 
 
-            return 4;
+            return 5;
         }
 
         public int UpdateFrom1()
@@ -75,6 +78,29 @@ namespace Piedone.Facebook.Suite.Migrations
             SchemaBuilder.ExecuteSql("EXEC sp_rename 'Piedone_Facebook_Suite_FacebookUserPartRecord', 'Piedone_Facebook_Suite_Connect_FacebookUserPartRecord'");
 
             return 4;
+        }
+
+        public int UpdateFrom4()
+        {
+            SchemaBuilder.CreateTable(typeof(FacebookConnectSettingsPartRecord).Name,
+                table => table
+                    .ContentPartRecord()
+                    .Column<string>("Permissions")
+                    .Column<bool>("AutoLogin")
+                    .Column<bool>("OnlyAllowVerified")
+                    .Column<bool>("SimpleRegistration")
+            );
+
+            ContentDefinitionManager.AlterTypeDefinition("FacebookConnectWidget",
+                cfg => cfg
+                    .RemovePart("FacebookConnectPart")
+                    .WithPart(typeof(FacebookConnectWidgetPart).Name));
+
+            ContentDefinitionManager.DeletePartDefinition("FacebookConnectPart");
+
+            SchemaBuilder.DropTable("FacebookConnectPartRecord");
+
+            return 5;
         }
     }
 }
