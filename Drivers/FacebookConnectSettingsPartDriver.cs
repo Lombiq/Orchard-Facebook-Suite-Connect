@@ -1,14 +1,8 @@
-﻿using System;
-using System.Dynamic;
-using Orchard.ContentManagement;
+﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
-using Orchard.Security;
-using Orchard.UI.Notify;
-using Piedone.Avatars.Models;
 using Piedone.Facebook.Suite.Models;
-using Piedone.Facebook.Suite.Services;
 
 namespace Piedone.Facebook.Suite.Drivers
 {

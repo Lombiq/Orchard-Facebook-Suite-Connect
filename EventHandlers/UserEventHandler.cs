@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.Users.Events;
+﻿using System.Collections.Generic;
+using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
 using Orchard.Security;
-using Piedone.Facebook.Suite.Services;
-using Orchard.ContentManagement;
-using Piedone.Facebook.Suite.Models;
 using Orchard.Settings;
+using Orchard.Users.Events;
+using Piedone.Facebook.Suite.Models;
+using Piedone.Facebook.Suite.Services;
 
 namespace Piedone.Facebook.Suite.EventHandlers
 {

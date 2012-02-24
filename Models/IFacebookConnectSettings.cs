@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Piedone.Facebook.Suite.Models
 {
     public interface IFacebookConnectSettings

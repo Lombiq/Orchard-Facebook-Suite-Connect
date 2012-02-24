@@ -1,5 +1,4 @@
 ﻿using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 
 namespace Piedone.Facebook.Suite.Models

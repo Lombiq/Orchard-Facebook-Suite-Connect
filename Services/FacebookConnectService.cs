@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Web;
 using Facebook.Web;
 using Orchard;
 using Orchard.ContentManagement; // For generic ContentManager methods
@@ -10,14 +8,8 @@ using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Security;
-using Orchard.Settings;
-using Piedone.Avatars.Services;
-using Piedone.Facebook.Suite.Models;
-using Piedone.HelpfulLibraries.ServiceValidation.ValidationDictionaries;
-using Piedone.HelpfulLibraries.Tasks;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Piedone.Facebook.Suite.EventHandlers;
+using Piedone.Facebook.Suite.Models;
 
 namespace Piedone.Facebook.Suite.Services
 {

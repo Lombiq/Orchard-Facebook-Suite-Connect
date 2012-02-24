@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.Environment.Extensions;
-using Piedone.Facebook.Suite.Models;
-using Orchard.ContentManagement.Drivers;
-using Orchard.Security;
-using Piedone.Facebook.Suite.Services;
+﻿using System.Collections.Generic;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.Drivers;
+using Orchard.Environment.Extensions;
+using Orchard.Localization;
+using Orchard.Security;
 using Orchard.Settings;
 using Orchard.UI.Notify;
-using Orchard.Localization;
+using Piedone.Facebook.Suite.Models;
+using Piedone.Facebook.Suite.Services;
 
 namespace Piedone.Facebook.Suite.Drivers
 {

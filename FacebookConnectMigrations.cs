@@ -2,7 +2,6 @@ using Orchard.ContentManagement.MetaData;
 using Orchard.Data.Migration;
 using Orchard.Environment.Extensions;
 using Piedone.Facebook.Suite.Models;
-using Orchard.ContentManagement;
 
 namespace Piedone.Facebook.Suite.Migrations
 {

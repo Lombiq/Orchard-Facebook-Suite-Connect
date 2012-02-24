@@ -1,11 +1,10 @@
-﻿using Orchard;
-using Piedone.Facebook.Suite.Models;
-using Piedone.HelpfulLibraries.ServiceValidation.ServiceInterfaces;
-using Orchard.Security;
-using System;
-using System.Linq;
-using Orchard.ContentManagement;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Orchard;
+using Orchard.ContentManagement;
+using Orchard.Security;
+using Piedone.Facebook.Suite.Models;
 
 namespace Piedone.Facebook.Suite.Services
 {

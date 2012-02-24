@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
+using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
+using Orchard.Mvc;
 using Orchard.Mvc.Extensions;
+using Orchard.Security;
+using Orchard.Settings;
+using Orchard.Themes;
 using Orchard.UI.Notify;
+using Orchard.Users.Services;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
-using Orchard;
-using Orchard.Mvc;
-using Orchard.Users.Services;
-using System;
-using Orchard.Security;
-using Orchard.Themes;
-using Orchard.Settings;
 
 namespace Piedone.Facebook.Suite.Controllers
 {

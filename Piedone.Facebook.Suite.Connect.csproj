@@ -70,6 +70,7 @@
   <ItemGroup>
     <Content Include="Scripts\FacebookConnect.js" />
     <Content Include="Styles\piedone-facebook-suite-connect.css" />
+    <None Include="Views\Parts\FacebookUser.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
@@ -82,6 +83,7 @@
     <Compile Include="Controllers\ConnectController.cs" />
     <Compile Include="Drivers\FacebookConnectSettingsPartDriver.cs" />
     <Compile Include="Drivers\FacebookConnectWidgetPartDriver.cs" />
+    <Compile Include="Drivers\FacebookUserPartDriver.cs" />
     <Compile Include="EventHandlers\AvatarsEventHandler.cs" />
     <Compile Include="EventHandlers\IFacebookConnectEventHandler.cs" />
     <Compile Include="EventHandlers\UserEventHandler.cs" />
