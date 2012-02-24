@@ -1,0 +1,6 @@
+﻿<a href="" id="facebook-connect-link" class="piedone-facebook-suite-connect connect-link">
+    @T("Attach your Facebook account to your username for simple login")
+</a>
+<script type="text/javascript">
+    $.facebookConnect.initializeLogin("@Html.Raw(Model.ReturnUrl)", "@Model.Permissions");
+</script>

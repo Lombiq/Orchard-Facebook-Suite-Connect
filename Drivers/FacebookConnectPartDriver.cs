@@ -46,7 +46,7 @@ namespace Piedone.Facebook.Suite.Drivers
             return ContentShape("Parts_FacebookConnect",
                 () =>
                 {
-                    var isAuthenticated = _authenticationService.GetAuthenticatedUser() != null;
+                    var isAuthenticated = _authenticationService.IsAuthenticated();
                     var isConnected = _facebookConnectService.IsAuthorized(part.Permissions) && _facebookConnectService.AuthenticatedFacebookUserIsSaved();
 
                     IFacebookUser authenticatedFacebookUser = null;

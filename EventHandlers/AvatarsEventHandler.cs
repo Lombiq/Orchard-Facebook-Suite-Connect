@@ -8,9 +8,11 @@ using Orchard.ContentManagement;
 using Piedone.Avatars.Services;
 using Orchard.Logging;
 using System.IO;
+using Orchard.Environment.Extensions;
 
 namespace Piedone.Facebook.Suite.EventHandlers
 {
+    [OrchardFeature("Piedone.Facebook.Suite.Connect")]
     public class AvatarsEventHandler : IFacebookConnectEventHandler
     {
         private readonly IAvatarsService _avatarsService;

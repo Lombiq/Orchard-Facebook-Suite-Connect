@@ -2,13 +2,9 @@
 @{
     string returnUrl = Context.Request.QueryString["ReturnUrl"] ?? Context.Request.RawUrl;
 
-    if (!Model.IsAuthenticated)
+    if (!Model.IsAuthenticated || Model.IsAuthenticated && !Model.IsConnected)
     {
         returnUrl = Url.Action("Connect", "Connect", new { Area = "Piedone.Facebook.Suite.Connect", ConnectId = Model.ContentPart.Id, ReturnUrl = returnUrl });
-    }
-    else
-    {
-        returnUrl = Url.Action("LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = returnUrl });
     }
 }
 @{
@@ -25,5 +21,5 @@ else if (Model.IsConnected)
 }
 else
 {
-    @Html.ActionLink(T("Sign out to log in with Facebook").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { @class = "piedone-facebook-suite-connect sign-out-to-connect-with-facebook-link" })
+    @Display(New.FacebookConnectAuthenticatedNotConnected(Permissions: Model.ContentPart.Permissions, ReturnUrl: returnUrl))
 }

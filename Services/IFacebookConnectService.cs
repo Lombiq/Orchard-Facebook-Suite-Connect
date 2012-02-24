@@ -92,18 +92,7 @@ namespace Piedone.Facebook.Suite.Services
         /// </summary>
         public static IFacebookUser GetAuthenticatedFacebookUser(this IFacebookConnectService service)
         {
-            // _authenticationService.GetAuthenticatedUser().As<FacebookUserPart>(); would
-            // return an empty object, under some circumstances, see GetFacebookUserPart(int id).
-            //var authenticatedUser = _authenticationService.GetAuthenticatedUser();
-            //if (authenticatedUser == null) return null;
-
-            var facebookUser = service.GetFacebookUser(service.AuthenticatedFacebookUserId);
-
-            // This happens if one is logged in at FB and in Orchard, but here not with FB creditentials.
-            // Since FacebookUserPart is attached to the User type, an empty FacebookUserPart record will be created if the User exists.
-            if (facebookUser != null && facebookUser.FacebookUserId == 0) return null;
-
-            return facebookUser;
+            return service.GetFacebookUser(service.AuthenticatedFacebookUserId);
         }
 
         /// <summary>

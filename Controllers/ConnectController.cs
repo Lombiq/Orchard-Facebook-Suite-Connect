@@ -48,19 +48,19 @@ namespace Piedone.Facebook.Suite.Controllers
             T = NullLocalizer.Instance;
         }
 
-        /// <summary>
-        /// Used when connecting through button click (not autologin)
-        /// </summary>
         public ActionResult Connect(int connectId, string returnUrl = "")
         {
-            if (_authenticationService.GetAuthenticatedUser() != null) return this.RedirectLocal(returnUrl);
-
             if (IsAuthorized(connectId))
             {
                 if (_facebookConnectService.AuthenticatedFacebookUserIsSaved())
                 {
                     var facebookUser = _facebookConnectService.UpdateAuthenticatedFacebookUser();
                     _authenticationService.SignIn(facebookUser.As<IUser>(), false);
+                }
+                // With this existing users can attach their FB account to their local accounts
+                else if (_authenticationService.IsAuthenticated())
+                {
+                    _facebookConnectService.UpdateFacebookUser(_authenticationService.GetAuthenticatedUser(), _facebookConnectService.FetchMe());
                 }
                 else return RegistrationForm();
             }
@@ -73,8 +73,6 @@ namespace Piedone.Facebook.Suite.Controllers
         [HttpPost]
         public ActionResult Connect(string userName, int connectId, string returnUrl = "")
         {
-            if (_authenticationService.GetAuthenticatedUser() != null) return this.RedirectLocal(returnUrl);
-
             // This a notably elegant solution for not checking the e-mail :-). We don't require e-mail from Facebook users currently.
             if (!_userService.VerifyUserUnicity(userName, "dféfdéfdkék342ü45ü43ü453578"))
             {
