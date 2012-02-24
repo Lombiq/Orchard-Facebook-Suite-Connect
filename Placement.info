@@ -1,4 +1,5 @@
 ﻿<Placement>
   <Place Parts_FacebookConnectSettings_SiteSettings="Content:11"/>
   <Place Parts_FacebookConnectWidget="Content:10"/>
+  <Place Parts_FacebookUser="Content:10"/>
 </Placement>
