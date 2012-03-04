@@ -90,7 +90,7 @@ namespace Piedone.Facebook.Suite.Services
             }
             catch (Exception ex)
             {
-                throw new OrchardException(T("Error in retrieving Facebook user data: " + ex.Message), ex); // Useless to localize
+                throw new OrchardException(T("Error in retrieving Facebook user data: {0}", ex.Message), ex); // Useless to localize
             }
         }
 
