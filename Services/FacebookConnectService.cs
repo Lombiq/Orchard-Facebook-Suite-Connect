@@ -128,6 +128,8 @@ namespace Piedone.Facebook.Suite.Services
 
         public IFacebookUser GetFacebookUser(long facebookId)
         {
+            if (facebookId == 0) return null;
+
             return _contentManager
                 .Query<FacebookUserPart, FacebookUserPartRecord>()
                 .Where(u => u.FacebookUserId == facebookId).List().FirstOrDefault<FacebookUserPart>();

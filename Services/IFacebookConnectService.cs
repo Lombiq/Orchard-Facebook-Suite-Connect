@@ -98,6 +98,8 @@ namespace Piedone.Facebook.Suite.Services
         /// </summary>
         public static IFacebookUser GetAuthenticatedFacebookUser(this IFacebookConnectService service)
         {
+            if (service.AuthenticatedFacebookUserId == 0) return null;
+
             return service.GetFacebookUser(service.AuthenticatedFacebookUserId);
         }
 
