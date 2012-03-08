@@ -2,7 +2,7 @@ Name: Facebook Suite Connect
 AntiForgery: enabled
 Author: Piedone
 Website: http://facebooksuiteconnect.codeplex.com
-Version: 1.0
+Version: 1.0.1
 OrchardVersion: 1.4
 Description: Lets user authenticate with their Facebook account
 Features:
