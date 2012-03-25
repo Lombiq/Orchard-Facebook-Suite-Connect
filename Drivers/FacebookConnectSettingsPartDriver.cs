@@ -3,6 +3,7 @@ using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Piedone.Facebook.Suite.Models;
+using Orchard.ContentManagement.Handlers;
 
 namespace Piedone.Facebook.Suite.Drivers
 {
@@ -35,6 +36,22 @@ namespace Piedone.Facebook.Suite.Drivers
             updater.TryUpdateModel(part, Prefix, null, null);
 
             return Editor(part, shapeHelper);
+        }
+
+        protected override void Exporting(FacebookConnectSettingsPart part, ExportContentContext context)
+        {
+            context.Element(part.PartDefinition.Name).SetAttributeValue("Permissions", part.Permissions);
+            context.Element(part.PartDefinition.Name).SetAttributeValue("AutoLogin", part.AutoLogin);
+            context.Element(part.PartDefinition.Name).SetAttributeValue("OnlyAllowVerified", part.OnlyAllowVerified);
+            context.Element(part.PartDefinition.Name).SetAttributeValue("SimpleRegistration", part.SimpleRegistration);
+        }
+
+        protected override void Importing(FacebookConnectSettingsPart part, ImportContentContext context)
+        {
+            part.Permissions = context.Attribute(part.PartDefinition.Name, "Permissions");
+            part.AutoLogin = bool.Parse(context.Attribute(part.PartDefinition.Name, "AutoLogin"));
+            part.OnlyAllowVerified = bool.Parse(context.Attribute(part.PartDefinition.Name, "OnlyAllowVerified"));
+            part.SimpleRegistration = bool.Parse(context.Attribute(part.PartDefinition.Name, "SimpleRegistration"));
         }
     }
 }
