@@ -10,6 +10,9 @@ namespace Piedone.Facebook.Suite.Drivers
     {
         protected override DriverResult Display(FacebookUserPart part, string displayType, dynamic shapeHelper)
         {
+            // There is no FB profile saved
+            if (part.FacebookUserId == 0) return null;
+
             return ContentShape("Parts_FacebookUser",
                 () => shapeHelper.Parts_FacebookUser());
         }
