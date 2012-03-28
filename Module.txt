@@ -4,10 +4,10 @@ Author: Piedone
 Website: http://facebooksuiteconnect.codeplex.com
 Version: 1.0.3
 OrchardVersion: 1.4
-Description: Lets user authenticate with their Facebook account
+Description: Lets users authenticate with their Facebook account
 Features:
 	Piedone.Facebook.Suite.Connect:
 		Name: Facebook Connect
-        Description: Lets user authenticate with their Facebook account
+        Description: Lets users authenticate with their Facebook account
 		Category: Facebook Suite
 		Dependencies: Orchard.Users, Piedone.Facebook.Suite, Piedone.Avatars, Orchard.Widgets
