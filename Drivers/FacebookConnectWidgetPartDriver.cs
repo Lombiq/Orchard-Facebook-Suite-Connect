@@ -51,19 +51,7 @@ namespace Piedone.Facebook.Suite.Drivers
 
                     IFacebookUser authenticatedFacebookUser = null;
 
-                    if (!isAuthenticated && isConnected && settings.AutoLogin)
-                    {
-                        authenticatedFacebookUser = _facebookConnectService.UpdateAuthenticatedFacebookUser();
-
-                        IEnumerable<FacebookConnectValidationKey> errors;
-                        if (_facebookConnectService.UserIsValid(authenticatedFacebookUser, settings, out errors))
-                        {
-                            _authenticationService.SignIn(authenticatedFacebookUser.As<IUser>(), false);
-                            isAuthenticated = true;
-                            //CurrentUser.PictureLink = !String.IsNullOrEmpty(avatar.ImageUrl) ? avatar.ImageUrl : currentFacebookUserPart.PictureLink; 
-                        }
-                    }
-                    else if (isConnected)
+                    if (isConnected)
                     {
                         authenticatedFacebookUser = _facebookConnectService.GetAuthenticatedFacebookUser();
                     }

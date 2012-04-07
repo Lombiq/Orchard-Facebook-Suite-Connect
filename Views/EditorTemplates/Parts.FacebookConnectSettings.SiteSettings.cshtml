@@ -13,12 +13,6 @@
             <span class="hint">@T("If extended permissions are needed, enter a list of permission, separated by commas.")</span>
         </li>
         <li>
-            @Html.EditorFor(m => m.AutoLogin)
-            <label for="@Html.FieldIdFor(m => m.AutoLogin)" class="forcheckbox">@T("Automatically log in authenticated and connected users")</label>
-            @Html.ValidationMessageFor(m => m.AutoLogin)
-            <span class="hint">@T("If checked, users who have connected to the site and are logged in at Facebook will be automatically logged in on the site, without clicking the login button. NOTE: this will practically prevent users from logging out of Orchard till they're logged in at Facebook.")</span>
-        </li>
-        <li>
             @Html.EditorFor(m => m.OnlyAllowVerified)
             <label for="@Html.FieldIdFor(m => m.OnlyAllowVerified)" class="forcheckbox">@T("Only allow verified users")</label>
             @Html.ValidationMessageFor(m => m.OnlyAllowVerified)

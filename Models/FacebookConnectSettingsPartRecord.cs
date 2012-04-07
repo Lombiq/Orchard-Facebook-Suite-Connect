@@ -7,14 +7,12 @@ namespace Piedone.Facebook.Suite.Models
     public class FacebookConnectSettingsPartRecord : ContentPartRecord, IFacebookConnectSettings
     {
         public virtual string Permissions { get; set; }
-        public virtual bool AutoLogin { get; set; }
         public virtual bool OnlyAllowVerified { get; set; }
         public virtual bool SimpleRegistration { get; set; }
 
         public FacebookConnectSettingsPartRecord()
         {
             Permissions = "";
-            AutoLogin = false;
             OnlyAllowVerified = false;
             SimpleRegistration = false;
         }

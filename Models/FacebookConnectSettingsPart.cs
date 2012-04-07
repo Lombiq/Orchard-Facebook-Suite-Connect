@@ -12,12 +12,6 @@ namespace Piedone.Facebook.Suite.Models
             set { Record.Permissions = value; }
         }
 
-        public bool AutoLogin
-        {
-            get { return Record.AutoLogin; }
-            set { Record.AutoLogin = value; }
-        }
-
         public bool OnlyAllowVerified
         {
             get { return Record.OnlyAllowVerified; }

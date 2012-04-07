@@ -52,6 +52,20 @@ namespace Piedone.Facebook.Suite.Controllers
             T = NullLocalizer.Instance;
         }
 
+        [HttpPost]
+        public void SaveSession(long userId, string accessToken)
+        {
+            _facebookConnectService.SetSession(userId, accessToken);
+            // Could return some status too...
+        }
+
+        [HttpPost]
+        public void DestroySession()
+        {
+            _facebookConnectService.DestroySession();
+            // Could return some status too...
+        }
+
         public ActionResult Connect(string returnUrl = "")
         {
             var settings = GetSettings();
@@ -145,9 +159,9 @@ namespace Piedone.Facebook.Suite.Controllers
                 {
                     switch (error)
                     {
-                        case FacebookConnectValidationKey.NoPermissionsGranted:
-                            _notifier.Error(T("You haven't granted the requested permissions."));
-                            //ModelState.AddModelError("notVerified", T("You haven't granted the requested permissions."));
+                        case FacebookConnectValidationKey.NotAuthenticated:
+                            _notifier.Error(T("You are not logged in and connected to the app."));
+                            //ModelState.AddModelError("notVerified", T("You are not logged in and connected to the app."));
                             break;
                         case FacebookConnectValidationKey.NotVerified:
                             _notifier.Error(T("You're not a verified Facebook user. Only verified users are allowed to register, so please verify your account."));

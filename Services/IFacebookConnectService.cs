@@ -5,6 +5,7 @@ using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Security;
 using Piedone.Facebook.Suite.Models;
+using Facebook;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -13,7 +14,7 @@ namespace Piedone.Facebook.Suite.Services
     /// </summary>
     public enum FacebookConnectValidationKey
     {
-        NoPermissionsGranted,
+        NotAuthenticated,
         NotVerified
     }
 
@@ -26,20 +27,27 @@ namespace Piedone.Facebook.Suite.Services
     public interface IFacebookConnectService : IDependency
     {
         /// <summary>
-        /// Facebook UserId of the currently authenticated Facebok user
+        /// The Facebook session associated with the current user.
+        /// NULL, if there is no session (i.e. if the user is not authenticated with our app yet).
         /// </summary>
-        long AuthenticatedFacebookUserId { get; }
+        FacebookSession Session { get; }
 
         /// <summary>
-        /// Checks if the user is connected to our Facebook app and is authenticated on Facebook
+        /// Sets the Facebook session for the current user
         /// </summary>
-        bool IsAuthenticated();
+        /// <param name="userId">Facebook user id of the current user</param>
+        /// <param name="accessToken">The access token for the current user</param>
+        void SetSession(long userId, string accessToken);
 
         /// <summary>
-        /// Checks if the user is authenticated and granted permissions
+        /// Destroys the Facebook session of the current user
         /// </summary>
-        /// <param name="permissions">An array of Facebook permissions to authorize against</param>
-        bool IsAuthorized(string[] permissions = null);
+        void DestroySession();
+
+        /// <summary>
+        /// The FacebookClient object associated with the current session
+        /// </summary>
+        FacebookClient ClientForSession { get; }
 
         /// <summary>
         /// Fetches the currently authenticated user's profile data from Facebook
@@ -70,19 +78,11 @@ namespace Piedone.Facebook.Suite.Services
     public static class FacebookConnectServiceExtensions
     {
         /// <summary>
-        /// Converts a comma-delimited string of Facebook permissions to an array
+        /// Checks if the user is connected to our Facebook app and is authenticated on Facebook
         /// </summary>
-        /// <param name="permissions">The permissions string</param>
-        public static bool IsAuthorized(this IFacebookConnectService service, string permissions)
+        public static bool IsAuthenticated(this IFacebookConnectService service)
         {
-            string[] permissionArray = new string[0];
-            if (permissions != null)
-            {
-                permissionArray = permissions.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                permissionArray = (from p in permissionArray select p.Trim()).ToArray();
-            }
-
-            return service.IsAuthorized(permissionArray);
+            return service.Session != null;
         }
 
         /// <summary>
@@ -90,7 +90,9 @@ namespace Piedone.Facebook.Suite.Services
         /// </summary>
         public static bool AuthenticatedFacebookUserIsSaved(this IFacebookConnectService service)
         {
-            return service.GetFacebookUser(service.AuthenticatedFacebookUserId) != null;
+            if (!service.IsAuthenticated()) return false;
+
+            return service.GetFacebookUser(service.Session.UserId) != null;
         }
 
         /// <summary>
@@ -98,9 +100,9 @@ namespace Piedone.Facebook.Suite.Services
         /// </summary>
         public static IFacebookUser GetAuthenticatedFacebookUser(this IFacebookConnectService service)
         {
-            if (service.AuthenticatedFacebookUserId == 0) return null;
+            if (!service.IsAuthenticated()) return null;
 
-            return service.GetFacebookUser(service.AuthenticatedFacebookUserId);
+            return service.GetFacebookUser(service.Session.UserId);
         }
 
         /// <summary>

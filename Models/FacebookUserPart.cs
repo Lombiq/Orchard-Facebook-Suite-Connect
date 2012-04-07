@@ -68,5 +68,12 @@ namespace Piedone.Facebook.Suite.Models
             get { return Record.IsVerified; }
             set { Record.IsVerified = value; }
         }
+
+        // To be used later
+        public string AccessToken
+        {
+            get { return Record.AccessToken; }
+            set { Record.AccessToken = value; }
+        }
     }
 }

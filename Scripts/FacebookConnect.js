@@ -1,40 +1,67 @@
 ﻿(function ($) {
     $.extend({
         facebookConnect: {
-            initializeLogin: function (returnUrl, scope) {
+            initializeLogin: function (returnUrl, scope, saveSessionUrl, requestVerificationToken) {
                 that = this;
                 $("#facebook-connect-link").click(function (event) {
                     event.preventDefault();
-                    that.login(returnUrl, scope);
+                    that.login(returnUrl, scope, saveSessionUrl, requestVerificationToken);
                 });
             },
 
-            login: function (returnUrl, scope) {
+            login: function (returnUrl, scope, saveSessionUrl, requestVerificationToken) {
                 FB.login(function (response) {
-                    if (response.authResponse) {
-                        // user is logged in and granted some permissions.
+                    if (response.status === 'connected') {
+                        // The user is logged in and has authenticated the app
+
+                        $.ajax({
+                            type: "POST",
+                            url: saveSessionUrl,
+                            async: false,
+                            data: {
+                                    __RequestVerificationToken: requestVerificationToken,
+                                    userId: response.authResponse.userID,
+                                    accessToken: response.authResponse.accessToken
+                                  }
+                        }).done(function (response) {
+                            // Session saved
+                        });
+
                         if (returnUrl == null) {
                             window.location.reload();
                         }
                         else {
                             window.location.href = returnUrl;
                         }
+                    } else if (response.status === 'not_authorized') {
+                        // The user is logged in to Facebook, but has not authenticated the app
                     } else {
-                        //alert('User cancelled login or did not fully authorize.');
+                        // The user isn't logged in to Facebook.
                     }
                 }, { scope: scope });
             },
 
-            initializeLogout: function (returnUrl) {
+            initializeLogout: function (returnUrl, destroySessionUrl, requestVerificationToken) {
                 that = this;
                 $("#facebook-logout-link").click(function (event) {
                     event.preventDefault();
-                    that.logout(returnUrl);
+                    that.logout(returnUrl, destroySessionUrl, requestVerificationToken);
                 });
             },
 
-            logout: function (returnUrl) {
+            logout: function (returnUrl, destroySessionUrl, requestVerificationToken) {
                 FB.logout(function (response) {
+                    $.ajax({
+                        type: "POST",
+                        url: destroySessionUrl,
+                        async: false,
+                        data: {
+                            __RequestVerificationToken: requestVerificationToken
+                        }
+                    }).done(function (response) {
+                        // Session destroyed
+                    });
+                    
                     if (returnUrl == null)
                         window.location.reload();
                     else

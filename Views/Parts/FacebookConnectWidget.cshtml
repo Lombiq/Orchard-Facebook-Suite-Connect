@@ -1,11 +1,6 @@
 ﻿@using System.Web.Mvc;
 @{
     string returnUrl = Context.Request.QueryString["ReturnUrl"] ?? Context.Request.RawUrl;
-
-    if (!Model.IsAuthenticated || Model.IsAuthenticated && !Model.IsConnected)
-    {
-        returnUrl = Url.Action("Connect", "Connect", new { Area = "Piedone.Facebook.Suite.Connect", ReturnUrl = returnUrl });
-    }
 }
 @{
     Script.Require("FacebookConnect").AtHead();

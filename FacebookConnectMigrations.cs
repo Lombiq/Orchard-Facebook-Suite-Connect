@@ -15,7 +15,6 @@ namespace Piedone.Facebook.Suite.Migrations
                 table => table
                     .ContentPartRecord()
                     .Column<string>("Permissions")
-                    .Column<bool>("AutoLogin")
                     .Column<bool>("OnlyAllowVerified")
                     .Column<bool>("SimpleRegistration")
             );
@@ -41,13 +40,14 @@ namespace Piedone.Facebook.Suite.Migrations
                     .Column<int>("TimeZone")
                     .Column<string>("Locale")
                     .Column<bool>("IsVerified")
+                    .Column<string>("AccessToken")
             ).AlterTable(typeof(FacebookUserPartRecord).Name,
                 table => table
                     .CreateIndex("FacebookUser", new string[] { "FacebookUserId" })
                 );
 
 
-            return 5;
+            return 6;
         }
 
         public int UpdateFrom1()
@@ -100,6 +100,21 @@ namespace Piedone.Facebook.Suite.Migrations
             SchemaBuilder.DropTable("FacebookConnectPartRecord");
 
             return 5;
+        }
+
+        public int UpdateFrom5()
+        {
+            SchemaBuilder.AlterTable(typeof(FacebookUserPartRecord).Name,
+                table => table
+                    .AddColumn<string>("AccessToken")
+                );
+
+            SchemaBuilder.AlterTable(typeof(FacebookConnectSettingsPartRecord).Name,
+                table => table
+                    .DropColumn("AutoLogin")
+                );
+
+            return 6;
         }
     }
 }

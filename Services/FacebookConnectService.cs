@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Facebook.Web;
 using Orchard;
 using Orchard.ContentManagement; // For generic ContentManager methods
 using Orchard.Environment.Extensions;
@@ -10,6 +9,8 @@ using Orchard.Logging;
 using Orchard.Security;
 using Piedone.Facebook.Suite.EventHandlers;
 using Piedone.Facebook.Suite.Models;
+using Facebook;
+using Orchard.Mvc;
 
 namespace Piedone.Facebook.Suite.Services
 {
@@ -18,14 +19,64 @@ namespace Piedone.Facebook.Suite.Services
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IContentManager _contentManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IFacebookSuiteService _facebookSuiteService;
         private readonly IFacebookConnectEventHandler _eventHandler;
-        private readonly Lazy<FacebookWebClient> _facebookWebClient;
 
-        public long AuthenticatedFacebookUserId
+        #region Session handling
+        private const string SessionName = "Piedone.Facebook.Suite.Connect.Models.FacebookSession";
+        private FacebookSession _session;
+        public FacebookSession Session
         {
-            get { return _facebookSuiteService.FacebookWebContext.UserId; }
+            get
+            {
+                if (_session == null)
+                {
+                    var session = _httpContextAccessor.Current().Session[SessionName];
+                    if (session != null)
+                    {
+                        _session = session as FacebookSession;
+                    }
+                }
+
+                return _session;
+            }
+
+            private set
+            {
+                _httpContextAccessor.Current().Session[SessionName] = _session = value;
+            }
         }
+
+        public void SetSession(long userId, string accessToken)
+        {
+            Session = new FacebookSessionImpl
+            {
+                UserId = userId,
+                AccessToken = accessToken
+            };
+        }
+
+        public void DestroySession()
+        {
+            Session = null;
+        }
+
+        private FacebookClient _clientForSession;
+        public FacebookClient ClientForSession
+        {
+            get
+            {
+                if (_clientForSession == null && Session != null)
+                {
+                    _clientForSession = _facebookSuiteService.GetNewClient();
+                    _clientForSession.AccessToken = Session.AccessToken;
+                }
+
+                return _clientForSession;
+            }
+        }
+        #endregion
 
         public ILogger Logger { get; set; }
         public Localizer T { get; set; }
@@ -33,44 +84,28 @@ namespace Piedone.Facebook.Suite.Services
         public FacebookConnectService(
             IAuthenticationService authenticationService,
             IContentManager contentManager,
+            IHttpContextAccessor httpContextAccessor,
             IFacebookSuiteService facebookSuiteService,
             IFacebookConnectEventHandler eventHandler)
         {
             _authenticationService = authenticationService;
             _contentManager = contentManager;
+            _httpContextAccessor = httpContextAccessor;
             _facebookSuiteService = facebookSuiteService;
             _eventHandler = eventHandler;
-            _facebookWebClient = new Lazy<FacebookWebClient>(() => new FacebookWebClient(_facebookSuiteService.FacebookWebContext));
 
             Logger = NullLogger.Instance; // Constructor injection of ILogger fails
             T = NullLocalizer.Instance;
         }
 
 
-        /// <inheritdoc/>
-        /// <summary>
-        /// WARNING: does not check if the user is authenticated with Orchard.
-        /// </summary>
-        /// <returns>True if the user is logged in on Facebook and connected to the app, false otherwise.</returns>
-        public bool IsAuthenticated()
-        {
-            return _facebookSuiteService.FacebookWebContext.IsAuthenticated();
-        }
-
-        /// <inheritdoc/>
-        public bool IsAuthorized(string[] permissions = null)
-        {
-            return _facebookSuiteService.FacebookWebContext.IsAuthorized(permissions);
-        }
-
-        // Esetleg bele egy IContent-be, és akkor az Update egyszerűbb?
         public IFacebookUser FetchMe()
         {
-            if (!IsAuthenticated()) return null;
+            if (!this.IsAuthenticated()) return null;
 
             try
             {
-                dynamic me = _facebookWebClient.Value.Get("me");
+                dynamic me = ClientForSession.Get("me");
 
                 var user = _contentManager.New<FacebookUserPart>("User");
 
@@ -97,9 +132,9 @@ namespace Piedone.Facebook.Suite.Services
         public bool UserIsValid(IFacebookUser facebookUser, IFacebookConnectSettings settings, out IEnumerable<FacebookConnectValidationKey> errors)
         {
             var errorsList = new List<FacebookConnectValidationKey>();
-            
 
-            if (!String.IsNullOrEmpty(settings.Permissions) && !this.IsAuthorized(settings.Permissions)) errorsList.Add(FacebookConnectValidationKey.NoPermissionsGranted);
+
+            if (!this.IsAuthenticated()) errorsList.Add(FacebookConnectValidationKey.NotAuthenticated);
             if (settings.OnlyAllowVerified && !facebookUser.IsVerified) errorsList.Add(FacebookConnectValidationKey.NotVerified);
 
             errors = errorsList;
@@ -133,6 +168,11 @@ namespace Piedone.Facebook.Suite.Services
             return _contentManager
                 .Query<FacebookUserPart, FacebookUserPartRecord>()
                 .Where(u => u.FacebookUserId == facebookId).List().FirstOrDefault<FacebookUserPart>();
+        }
+
+
+        private class FacebookSessionImpl : FacebookSession
+        {
         }
     }
 }
