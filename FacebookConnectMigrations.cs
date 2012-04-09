@@ -40,7 +40,6 @@ namespace Piedone.Facebook.Suite.Migrations
                     .Column<int>("TimeZone")
                     .Column<string>("Locale")
                     .Column<bool>("IsVerified")
-                    .Column<string>("AccessToken")
             ).AlterTable(typeof(FacebookUserPartRecord).Name,
                 table => table
                     .CreateIndex("FacebookUser", new string[] { "FacebookUserId" })
@@ -104,11 +103,6 @@ namespace Piedone.Facebook.Suite.Migrations
 
         public int UpdateFrom5()
         {
-            SchemaBuilder.AlterTable(typeof(FacebookUserPartRecord).Name,
-                table => table
-                    .AddColumn<string>("AccessToken")
-                );
-
             SchemaBuilder.AlterTable(typeof(FacebookConnectSettingsPartRecord).Name,
                 table => table
                     .DropColumn("AutoLogin")

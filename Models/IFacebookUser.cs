@@ -2,6 +2,9 @@
 
 namespace Piedone.Facebook.Suite.Models
 {
+    /// <summary>
+    /// A uniform interface for Facebook profile data
+    /// </summary>
     public interface IFacebookUser : IContent
     {
         long FacebookUserId { get; }

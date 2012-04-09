@@ -16,6 +16,5 @@ namespace Piedone.Facebook.Suite.Models
         public virtual int TimeZone { get; set; }
         public virtual string Locale { get; set; }
         public virtual bool IsVerified { get; set; }
-        public virtual string AccessToken { get; set; }
     }
 }
