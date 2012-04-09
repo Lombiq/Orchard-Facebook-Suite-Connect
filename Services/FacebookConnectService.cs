@@ -24,7 +24,7 @@ namespace Piedone.Facebook.Suite.Services
         private readonly IFacebookConnectEventHandler _eventHandler;
 
         #region Session handling
-        private const string SessionName = "Piedone.Facebook.Suite.Connect.Models.FacebookSession";
+        private const string _sessionName = "Piedone.Facebook.Suite.Connect.Models.FacebookSession";
         private FacebookSession _session;
         public FacebookSession Session
         {
@@ -32,7 +32,7 @@ namespace Piedone.Facebook.Suite.Services
             {
                 if (_session == null)
                 {
-                    var session = _httpContextAccessor.Current().Session[SessionName];
+                    var session = _httpContextAccessor.Current().Session[_sessionName];
                     if (session != null)
                     {
                         _session = session as FacebookSession;
@@ -44,17 +44,13 @@ namespace Piedone.Facebook.Suite.Services
 
             private set
             {
-                _httpContextAccessor.Current().Session[SessionName] = _session = value;
+                _httpContextAccessor.Current().Session[_sessionName] = _session = value;
             }
         }
 
-        public void SetSession(long userId, string accessToken)
+        public void SetSession(long userId, string accessToken, DateTime expiresUtc)
         {
-            Session = new FacebookSessionImpl
-            {
-                UserId = userId,
-                AccessToken = accessToken
-            };
+            Session = new FacebookSessionImpl(userId, accessToken, expiresUtc);
         }
 
         public void DestroySession()
@@ -173,6 +169,12 @@ namespace Piedone.Facebook.Suite.Services
 
         private class FacebookSessionImpl : FacebookSession
         {
+            public FacebookSessionImpl(long userId, string accessToken, DateTime expiresUtc)
+            {
+                UserId = userId;
+                AccessToken = accessToken;
+                ExpiresUtc = expiresUtc;
+            }
         }
     }
 }

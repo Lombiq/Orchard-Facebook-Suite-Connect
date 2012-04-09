@@ -37,7 +37,8 @@ namespace Piedone.Facebook.Suite.Services
         /// </summary>
         /// <param name="userId">Facebook user id of the current user</param>
         /// <param name="accessToken">The access token for the current user</param>
-        void SetSession(long userId, string accessToken);
+        /// <param name="expiresUtc">The UTC timestamp when the access token will expire</param>
+        void SetSession(long userId, string accessToken, DateTime expiresUtc);
 
         /// <summary>
         /// Destroys the Facebook session of the current user

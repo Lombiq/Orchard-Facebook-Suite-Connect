@@ -14,6 +14,7 @@ using Orchard.UI.Notify;
 using Orchard.Users.Services;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
+using Orchard.Services;
 
 namespace Piedone.Facebook.Suite.Controllers
 {
@@ -29,6 +30,7 @@ namespace Piedone.Facebook.Suite.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly IMembershipService _membershipService;
         private readonly INotifier _notifier;
+        private readonly IClock _clock;
 
         public Localizer T { get; set; }
 
@@ -39,7 +41,8 @@ namespace Piedone.Facebook.Suite.Controllers
             IUserService userService,
             IAuthenticationService authenticationService,
             IMembershipService membershipService,
-            INotifier notifier)
+            INotifier notifier,
+            IClock clock)
         {
             _orchardServices = orchardServices;
             _siteService = siteService;
@@ -48,14 +51,16 @@ namespace Piedone.Facebook.Suite.Controllers
             _authenticationService = authenticationService;
             _membershipService = membershipService;
             _notifier = notifier;
+            _clock = clock;
 
             T = NullLocalizer.Instance;
         }
 
         [HttpPost]
-        public void SaveSession(long userId, string accessToken)
+        public void SaveSession(long userId, string accessToken, int expiresIn)
         {
-            _facebookConnectService.SetSession(userId, accessToken);
+            // Taken one second for the whole request to take...
+            _facebookConnectService.SetSession(userId, accessToken, _clock.UtcNow.AddSeconds(expiresIn - 1));
             // Could return some status too...
         }
 

@@ -20,7 +20,7 @@ namespace Piedone.Facebook.Suite.Models
     {
         public static string GetPictureLink(this IFacebookUser user)
         {
-            return "http://graph.facebook.com/" + user.FacebookUserId + "/picture";;
+            return "http://graph.facebook.com/" + user.FacebookUserId + "/picture";
         }
     }
 }

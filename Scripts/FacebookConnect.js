@@ -21,7 +21,8 @@
                             data: {
                                     __RequestVerificationToken: requestVerificationToken,
                                     userId: response.authResponse.userID,
-                                    accessToken: response.authResponse.accessToken
+                                    accessToken: response.authResponse.accessToken,
+                                    expiresIn: response.authResponse.expiresIn
                                   }
                         }).done(function (response) {
                             // Session saved
