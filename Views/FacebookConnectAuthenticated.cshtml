@@ -3,18 +3,20 @@
 <div class="piedone-facebook-suite-connect current-user-profile">
     <a href="@Model.AuthenticatedFacebookUser.Link">
         <img src="@(((IFacebookUser)Model.AuthenticatedFacebookUser).GetPictureLink())" class="piedone-facebook-suite-connect current-user-profile-picture" alt="@T("{0}'s profile picture", Model.AuthenticatedFacebookUser.Name)" />
-    </a>
-    <strong class="piedone-facebook-suite-connect current-user-name">
+    </a><strong class="piedone-facebook-suite-connect current-user-name">
         @Model.AuthenticatedFacebookUser.Name
     </strong>
 </div>
-    
-<a href="" id="facebook-logout-link" class="piedone-facebook-suite-connect facebook-logout-link">
-    @T("Logout from Facebook")
-</a>
 
-<script type="text/javascript">
-$(document).live("facebook:ready", function () {
-    $.facebookConnect.initializeLogout("@Html.Raw(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
-});
-</script>
+@if (Model.IsAuthenticatedWithFacebookConnect)
+{
+    <a href="" id="facebook-logout-link" class="piedone-facebook-suite-connect facebook-logout-link">
+        @T("Logout from Facebook")
+    </a>
+
+    <script type="text/javascript">
+    $(document).live("facebook:ready", function () {
+        $.facebookConnect.initializeLogout("@Html.Raw(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
+    });
+    </script>
+}

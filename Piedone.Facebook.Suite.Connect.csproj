@@ -74,7 +74,6 @@
     <Content Include="Module.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationServiceExtensions.cs" />
     <Compile Include="Controllers\ConnectController.cs" />
     <Compile Include="Drivers\FacebookConnectSettingsPartDriver.cs" />
     <Compile Include="Drivers\FacebookConnectWidgetPartDriver.cs" />

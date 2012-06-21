@@ -46,19 +46,21 @@ namespace Piedone.Facebook.Suite.Drivers
                 {
                     var settings = _siteService.GetSiteSettings().As<FacebookConnectSettingsPart>();
 
-                    var isAuthenticated = _authenticationService.IsAuthenticated();
-                    var isConnected = _facebookConnectService.AuthenticatedFacebookUserIsSaved();
+                    var authenticatedUser = _authenticationService.GetAuthenticatedUser();
+                    var isConnected = _facebookConnectService.AuthenticatedFacebookUserIsSaved()
+                        || (authenticatedUser != null && !string.IsNullOrEmpty(authenticatedUser.As<FacebookUserPart>().Name));
 
                     IFacebookUser authenticatedFacebookUser = null;
 
                     if (isConnected)
                     {
-                        authenticatedFacebookUser = _facebookConnectService.GetAuthenticatedFacebookUser();
+                        authenticatedFacebookUser = authenticatedUser.As<FacebookUserPart>();
                     }
 
                     return shapeHelper.Parts_FacebookConnectWidget(
-                                IsAuthenticated: isAuthenticated,
+                                IsAuthenticated: authenticatedUser != null,
                                 IsConnected: isConnected,
+                                IsAuthenticatedWithFacebookConnect: _facebookConnectService.IsAuthenticated(),
                                 AuthenticatedFacebookUser: authenticatedFacebookUser);
                 });
         }

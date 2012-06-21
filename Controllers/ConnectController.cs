@@ -84,7 +84,7 @@ namespace Piedone.Facebook.Suite.Controllers
                     _authenticationService.SignIn(user.As<IUser>(), false);
                 }
                 // With this existing users can attach their FB account to their local accounts
-                else if (_authenticationService.IsAuthenticated())
+                else if (_authenticationService.GetAuthenticatedUser() != null)
                 {
                     _facebookConnectService.UpdateFacebookUser(_authenticationService.GetAuthenticatedUser(), facebookUser);
                 }

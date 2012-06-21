@@ -12,7 +12,7 @@
 }
 else if (Model.IsConnected)
 {
-    @Display(New.FacebookConnectAuthenticated(AuthenticatedFacebookUser: Model.AuthenticatedFacebookUser, ReturnUrl: returnUrl))
+    @Display(New.FacebookConnectAuthenticated(AuthenticatedFacebookUser: Model.AuthenticatedFacebookUser, IsAuthenticatedWithFacebookConnect: Model.IsAuthenticatedWithFacebookConnect, ReturnUrl: returnUrl))
 }
 else
 {
