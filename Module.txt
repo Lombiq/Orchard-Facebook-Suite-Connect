@@ -2,12 +2,12 @@ Name: Facebook Suite Connect
 AntiForgery: enabled
 Author: Piedone
 Website: http://facebooksuiteconnect.codeplex.com
-Version: 1.1
-OrchardVersion: 1.4
+Version: 1.2
+OrchardVersion: 1.5
 Description: Lets users authenticate with their Facebook account
 Features:
 	Piedone.Facebook.Suite.Connect:
 		Name: Facebook Connect
         Description: Lets users authenticate with their Facebook account
 		Category: Facebook Suite
-		Dependencies: Orchard.Users, Piedone.Facebook.Suite, Piedone.Avatars, Piedone.HelpfulLibraries.Utilities, Orchard.Widgets
+		Dependencies: Piedone.Facebook.Suite, Piedone.Avatars, Piedone.HelpfulLibraries.Utilities, Orchard.Users, Orchard.Widgets
