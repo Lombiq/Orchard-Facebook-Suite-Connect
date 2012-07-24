@@ -15,6 +15,7 @@ using Orchard.Users.Services;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
 using Orchard.Services;
+using Piedone.HelpfulLibraries.Utilities;
 
 namespace Piedone.Facebook.Suite.Controllers
 {
@@ -84,7 +85,7 @@ namespace Piedone.Facebook.Suite.Controllers
                     _authenticationService.SignIn(user.As<IUser>(), false);
                 }
                 // With this existing users can attach their FB account to their local accounts
-                else if (_authenticationService.GetAuthenticatedUser() != null)
+                else if (_authenticationService.IsAuthenticated())
                 {
                     _facebookConnectService.UpdateFacebookUser(_authenticationService.GetAuthenticatedUser(), facebookUser);
                 }

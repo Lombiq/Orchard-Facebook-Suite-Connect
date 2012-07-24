@@ -10,4 +10,4 @@ Features:
 		Name: Facebook Connect
         Description: Lets users authenticate with their Facebook account
 		Category: Facebook Suite
-		Dependencies: Orchard.Users, Piedone.Facebook.Suite, Piedone.Avatars, Orchard.Widgets
+		Dependencies: Orchard.Users, Piedone.Facebook.Suite, Piedone.Avatars, Piedone.HelpfulLibraries.Utilities, Orchard.Widgets
