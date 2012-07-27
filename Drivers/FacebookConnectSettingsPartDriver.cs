@@ -40,16 +40,20 @@ namespace Piedone.Facebook.Suite.Drivers
 
         protected override void Exporting(FacebookConnectSettingsPart part, ExportContentContext context)
         {
-            context.Element(part.PartDefinition.Name).SetAttributeValue("Permissions", part.Permissions);
-            context.Element(part.PartDefinition.Name).SetAttributeValue("OnlyAllowVerified", part.OnlyAllowVerified);
-            context.Element(part.PartDefinition.Name).SetAttributeValue("SimpleRegistration", part.SimpleRegistration);
+            var element = context.Element(part.PartDefinition.Name);
+
+            element.SetAttributeValue("Permissions", part.Permissions);
+            element.SetAttributeValue("OnlyAllowVerified", part.OnlyAllowVerified);
+            element.SetAttributeValue("SimpleRegistration", part.SimpleRegistration);
         }
 
         protected override void Importing(FacebookConnectSettingsPart part, ImportContentContext context)
         {
-            part.Permissions = context.Attribute(part.PartDefinition.Name, "Permissions");
-            part.OnlyAllowVerified = bool.Parse(context.Attribute(part.PartDefinition.Name, "OnlyAllowVerified"));
-            part.SimpleRegistration = bool.Parse(context.Attribute(part.PartDefinition.Name, "SimpleRegistration"));
+            var partName = part.PartDefinition.Name;
+
+            context.ImportAttribute(partName, "Permissions", value => part.Permissions = value);
+            context.ImportAttribute(partName, "OnlyAllowVerified", value => part.OnlyAllowVerified = bool.Parse(value));
+            context.ImportAttribute(partName, "SimpleRegistration", value => part.SimpleRegistration = bool.Parse(value));
         }
     }
 }
