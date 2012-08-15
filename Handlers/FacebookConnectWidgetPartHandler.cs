@@ -3,18 +3,19 @@ using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
 using Orchard.Settings;
 using Piedone.Facebook.Suite.Models;
+using Orchard.Environment;
 
 namespace Piedone.Facebook.Suite.Handlers
 {
     [OrchardFeature("Piedone.Facebook.Suite.Connect")]
     public class FacebookConnectWidgetPartHandler : ContentHandler
     {
-        public FacebookConnectWidgetPartHandler(ISiteService siteService)
+        public FacebookConnectWidgetPartHandler(Work<ISiteService> siteServiceWork)
         {
-            OnLoaded<FacebookConnectWidgetPart>((context, part) =>
-            {
-                part.PermissionsField.Loader(() => siteService.GetSiteSettings().As<FacebookConnectSettingsPart>().Permissions);
-            });
+            OnActivated<FacebookConnectWidgetPart>((context, part) =>
+                {
+                    part.PermissionsField.Loader(() => siteServiceWork.Value.GetSiteSettings().As<FacebookConnectSettingsPart>().Permissions);
+                });
         }
     }
 }
