@@ -20,6 +20,10 @@
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
     <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -112,15 +116,15 @@
       <Name>Orchard.Users</Name>
     </ProjectReference>
     <ProjectReference Include="..\Piedone.Avatars\Piedone.Avatars.csproj">
-      <Project>{3807D385-0FEB-4212-AE29-FC9EAD9E50C1}</Project>
+      <Project>{3807d385-0feb-4212-ae29-fc9ead9e50c1}</Project>
       <Name>Piedone.Avatars</Name>
     </ProjectReference>
     <ProjectReference Include="..\Piedone.Facebook.Suite\Piedone.Facebook.Suite.csproj">
-      <Project>{DA71C952-BB8A-4FCD-8EC5-0D9ACB71E436}</Project>
+      <Project>{da71c952-bb8a-4fcd-8ec5-0d9acb71e436}</Project>
       <Name>Piedone.Facebook.Suite</Name>
     </ProjectReference>
     <ProjectReference Include="..\Piedone.HelpfulLibraries\Piedone.HelpfulLibraries.csproj">
-      <Project>{EA61AD10-39D6-41A9-B12B-227F50C54158}</Project>
+      <Project>{ea61ad10-39d6-41a9-b12b-227f50c54158}</Project>
       <Name>Piedone.HelpfulLibraries</Name>
     </ProjectReference>
   </ItemGroup>
