@@ -16,7 +16,7 @@
 
     <script type="text/javascript">
     $(document).live("facebook:ready", function () {
-        $.facebookConnect.initializeLogout("@Html.Raw(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
+        $.facebookConnect.initializeLogout("@Url.Encode(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
     });
     </script>
 }

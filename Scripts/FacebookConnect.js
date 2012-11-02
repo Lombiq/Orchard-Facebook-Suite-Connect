@@ -32,7 +32,7 @@
                             window.location.reload();
                         }
                         else {
-                            window.location.href = returnUrl;
+                            window.location.href = decodeURIComponent((returnUrl + '').replace(/\+/g, '%20'));
                         }
                     } else if (response.status === 'not_authorized') {
                         // The user is logged in to Facebook, but has not authenticated the app
@@ -66,7 +66,7 @@
                     if (returnUrl == null)
                         window.location.reload();
                     else
-                        window.location.href = returnUrl;
+                        window.location.href = decodeURIComponent((returnUrl + '').replace(/\+/g, '%20'));
                 });
             }
         }
