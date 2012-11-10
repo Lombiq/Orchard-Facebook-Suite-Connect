@@ -68,7 +68,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\FacebookConnect.js" />
+    <Content Include="Scripts\piedone-facebook-suite-connect.js" />
     <Content Include="Styles\piedone-facebook-suite-connect.css" />
     <None Include="Views\Parts\FacebookUser.cshtml" />
     <Content Include="Web.config" />
