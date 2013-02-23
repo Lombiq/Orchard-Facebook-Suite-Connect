@@ -10,13 +10,16 @@
 
 @if (Model.IsAuthenticatedWithFacebookConnect)
 {
-    <a href="" id="facebook-logout-link" class="piedone-facebook-suite-connect facebook-logout-link">
+    <a href="#" id="facebook-logout-link" class="piedone-facebook-suite-connect facebook-logout-link">
         @T("Logout from Facebook")
     </a>
 
-    <script type="text/javascript">
-    $(document).live("facebook:ready", function () {
-        $.facebookConnect.initializeLogout("@Url.Encode(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
-    });
-    </script>
+    using (Script.Foot())
+    {
+        <script type="text/javascript">
+            $(document).live("facebook:ready", function () {
+                $.facebookConnect.initializeLogout("@Url.Encode(Model.ReturnUrl)", "@Url.Action("DestroySession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
+            });
+        </script>
+    }
 }

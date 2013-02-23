@@ -3,7 +3,7 @@
     string returnUrl = Context.Request.QueryString["ReturnUrl"] ?? Context.Request.RawUrl;
 }
 @{
-    Script.Require("FacebookConnect").AtHead();
+    Script.Require("FacebookConnect").AtFoot();
     Style.Require("FacebookConnect");
 }
 @if (!Model.IsAuthenticated)

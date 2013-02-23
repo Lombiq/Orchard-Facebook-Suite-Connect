@@ -2,11 +2,15 @@
     var returnUrl = Url.Action("Connect", "Connect", new { Area = "Piedone.Facebook.Suite.Connect", ReturnUrl = Model.ReturnUrl });
 }
 
-<a href="" id="facebook-connect-link" class="piedone-facebook-suite-connect connect-link">
+<a href="#" id="facebook-connect-link" class="piedone-facebook-suite-connect connect-link">
     @T("Attach your Facebook account to your username for simple login")
 </a>
-<script type="text/javascript">
-$(document).live("facebook:ready", function () {
-    $.facebookConnect.initializeLogin("@Url.Encode(returnUrl)", "@Model.Permissions", "@Url.Action("SaveSession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
-});
-</script>
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        $(document).live("facebook:ready", function () {
+            $.facebookConnect.initializeLogin("@Url.Encode(returnUrl)", "@Model.Permissions", "@Url.Action("SaveSession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
+        });
+    </script>
+}
