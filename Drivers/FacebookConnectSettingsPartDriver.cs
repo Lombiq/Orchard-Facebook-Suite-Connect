@@ -1,9 +1,9 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
+using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Piedone.Facebook.Suite.Models;
-using Orchard.ContentManagement.Handlers;
 
 namespace Piedone.Facebook.Suite.Drivers
 {

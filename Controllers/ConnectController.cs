@@ -8,13 +8,13 @@ using Orchard.Localization;
 using Orchard.Mvc;
 using Orchard.Mvc.Extensions;
 using Orchard.Security;
+using Orchard.Services;
 using Orchard.Settings;
 using Orchard.Themes;
 using Orchard.UI.Notify;
 using Orchard.Users.Services;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
-using Orchard.Services;
 using Piedone.HelpfulLibraries.Utilities;
 
 namespace Piedone.Facebook.Suite.Controllers

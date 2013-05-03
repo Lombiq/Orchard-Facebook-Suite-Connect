@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Facebook;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Security;
 using Piedone.Facebook.Suite.Models;
-using Facebook;
 
 namespace Piedone.Facebook.Suite.Services
 {

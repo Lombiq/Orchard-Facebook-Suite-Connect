@@ -1,9 +1,9 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Handlers;
+using Orchard.Environment;
 using Orchard.Environment.Extensions;
 using Orchard.Settings;
 using Piedone.Facebook.Suite.Models;
-using Orchard.Environment;
 
 namespace Piedone.Facebook.Suite.Handlers
 {
