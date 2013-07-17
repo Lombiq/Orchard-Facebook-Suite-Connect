@@ -8,7 +8,7 @@ namespace Piedone.Facebook.Suite.Models
     public class FacebookConnectWidgetPart : ContentPart
     {
         private readonly LazyField<string> _permissions = new LazyField<string>();
-        public LazyField<string> PermissionsField { get { return _permissions; } }
+        internal LazyField<string> PermissionsField { get { return _permissions; } }
         public string Permissions
         {
             get { return _permissions.Value; }
