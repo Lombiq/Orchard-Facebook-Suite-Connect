@@ -15,7 +15,7 @@ using Orchard.UI.Notify;
 using Orchard.Users.Services;
 using Piedone.Facebook.Suite.Models;
 using Piedone.Facebook.Suite.Services;
-using Piedone.HelpfulLibraries.Utilities;
+using Piedone.HelpfulLibraries.Authentication;
 
 namespace Piedone.Facebook.Suite.Controllers
 {
