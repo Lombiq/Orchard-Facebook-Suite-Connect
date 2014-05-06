@@ -9,7 +9,7 @@
 @using (Script.Foot())
 {
     <script type="text/javascript">
-        $(document).live("facebook:ready", function () {
+        $(document).on("facebook:ready", function () {
             $.facebookConnect.initializeLogin("@Url.Encode(returnUrl)", "@Model.Permissions", "@Url.Action("SaveSession", "Connect", new { Area = "Piedone.Facebook.Suite.Connect" })", "@Html.AntiForgeryTokenValueOrchard()");
         });
     </script>
