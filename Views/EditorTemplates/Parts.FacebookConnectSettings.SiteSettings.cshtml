@@ -10,19 +10,19 @@
             @Html.LabelFor(model => model.Permissions, T("Permissions"))
             @Html.TextBoxFor(model => model.Permissions, new { @class = "text singleline" })
             @Html.ValidationMessageFor(model => model.Permissions)
-            <span class="hint">@T("If extended permissions are needed, enter a list of permission, separated by commas.")</span>
+            @Html.Hint(T("If extended permissions are needed, enter a list of permission, separated by commas."))
         </li>
         <li>
             @Html.EditorFor(m => m.OnlyAllowVerified)
             <label for="@Html.FieldIdFor(m => m.OnlyAllowVerified)" class="forcheckbox">@T("Only allow verified users")</label>
             @Html.ValidationMessageFor(m => m.OnlyAllowVerified)
-            <span class="hint">@T("If checked, only verified Facebook users will get authenticated.")</span>
+            @Html.Hint(T("If checked, only verified Facebook users will get authenticated."))
         </li>
         <li>
             @Html.EditorFor(m => m.SimpleRegistration)
             <label for="@Html.FieldIdFor(m => m.SimpleRegistration)" class="forcheckbox">@T("Simple registration")</label>
             @Html.ValidationMessageFor(m => m.SimpleRegistration)
-            <span class="hint">@T("If checked, new users will only be prompted for a user name when registering. This means that they won't be able to login with the built-in authentication form (only with their Facebook-account) and won't have an e-mail saved.")</span>
+            @Html.Hint(T("If checked, new users will only be prompted for a user name when registering. This means that they won't be able to login with the built-in authentication form (only with their Facebook-account) and won't have an e-mail saved."))
         </li>
     </ol>
 </fieldset>

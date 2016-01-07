@@ -8,7 +8,7 @@
                 <label for="UserName">@T("Username:")</label>
                 @Html.TextBox("UserName")
                 @Html.ValidationMessage("UserName")
-                <span class="hint">@T("Choose a unique username for your account you can login to with your Facebook credentials.")</span>
+                @Html.Hint(T("Choose a unique username for your account you can login to with your Facebook credentials."))
             </li>
         </ol>
     </fieldset>
